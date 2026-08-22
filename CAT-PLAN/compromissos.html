@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat-Plan - Compromissos</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <!-- Menu Lateral -->
+        <nav class="sidebar">
+            <button class="menu-btn active tarefas">Tarefas</button>
+            <button class="menu-btn estudos">Estudos</button>
+            <button class="menu-btn financas">Finanças</button>
+            <button class="menu-btn organizacao">Organização</button>
+            <button class="menu-btn hobby">Hobby</button>
+        </nav>
+
+        <!-- NOVO MIOLO: Layout de Compromissos -->
+        <section class="compromissos-layout">
+            
+            <!-- Coluna Esquerda: Cadastro -->
+            <div class="card form-compromisso">
+                <div class="card-header">
+                    <h3>COMPROMISSO</h3>
+                </div>
+                <div class="input-area">
+                    <textarea id="descCompromisso" placeholder="Descrever."></textarea>
+                </div>
+                <!-- Campo de data sutil para alimentar a lógica -->
+                <div class="date-picker-area">
+                    <input type="date" id="dataCompromisso">
+                </div>
+                <div class="card-footer">
+                    <img src="icone-adicionar.png" alt="Adicionar" class="icon-add" id="btnSalvarCompromisso">
+                </div>
+            </div>
+
+            <!-- Coluna Direita: Lista dinâmica -->
+            <div class="lista-compromissos" id="containerCompromissos">
+                <!-- Os cartões vão aparecer aqui automaticamente -->
+            </div>
+
+        </section>
+
+        <!-- Botões Superiores Direitos e Mascote -->
+        <aside class="right-panel">
+            <div class="top-buttons">
+                <!-- Links para navegar entre as páginas -->
+                <button class="action-btn" onclick="window.location.href='dashboard.html'">Tarefas diárias e rotina</button>
+                <button class="action-btn active-page">Compromissos</button>
+            </div>
+            
+            <!-- Mascote cortado pela metade -->
+            <img src="gato-escondido.png" alt="Gato escondido" class="mascot-peeking">
+        </aside>
+
+    </div>
+    
+    <script src="compromissos.js"></script>
+</body>
+</html>

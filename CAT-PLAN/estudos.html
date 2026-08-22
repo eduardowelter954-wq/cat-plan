@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat-Plan - Estudos</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container" style="max-width: 1400px;">
+        
+        <!-- Menu Lateral -->
+        <nav class="sidebar">
+            <button class="menu-btn tarefas" onclick="window.location.href='dashboard.html'">Tarefas</button>
+            <button class="menu-btn active estudos" onclick="window.location.href='estudos.html'">Estudos</button>
+            <button class="menu-btn financas">Finanças</button>
+            <button class="menu-btn organizacao">Organização</button>
+            <button class="menu-btn hobby">Hobby</button>
+        </nav>
+
+        <!-- Calendário e Dropzone -->
+        <section class="calendario-estudos">
+            <!-- Área de Espera (Fita Azul) -->
+            <div class="dropzone-azul" id="areaEspera">
+                <p style="color: #fff; opacity: 0.7; text-align: center; margin-top: 15px; width: 100%;">Solte tarefas aqui para levar para outra semana</p>
+            </div>
+            
+  <div class="date-navigation" style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 15px;">
+                <button class="arrow-btn" id="btnSemanaAnterior"><img src="seta-esquerda.png" alt="Anterior"></button>
+                
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <!-- O truque do calendário invisível -->
+                    <div style="position: relative; width: 35px; height: 35px;">
+                        <img src="icone-calendario.png" alt="Calendário" class="calendar-icon" style="width: 100%; height: 100%; object-fit: contain;">
+                        <input type="date" id="calendarioPicker" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
+                    </div>
+                    
+                    <span id="mesAnoDisplay" style="font-weight: bold; font-size: 16px; text-transform: uppercase;">MÊS ANO</span>
+                </div>
+                
+                <button class="arrow-btn" id="btnSemanaProxima"><img src="seta-direita.png" alt="Próximo"></button>
+            </div>
+
+            <!-- Grade dos dias da semana -->
+            <div class="week-grid">
+                <div class="day-card span-3" id="dia-Segunda" data-diadasemana="Segunda">
+                    <h4 id="head-Segunda">Segunda<br><span></span></h4>
+                    <div class="tasks-container"></div>
+                </div>
+                <div class="day-card span-3" id="dia-Terça" data-diadasemana="Terça">
+                    <h4 id="head-Terça">Terça<br><span></span></h4>
+                    <div class="tasks-container"></div>
+                </div>
+                <div class="day-card span-3" id="dia-Quarta" data-diadasemana="Quarta">
+                    <h4 id="head-Quarta">Quarta<br><span></span></h4>
+                    <div class="tasks-container"></div>
+                </div>
+                <div class="day-card span-3" id="dia-Quinta" data-diadasemana="Quinta">
+                    <h4 id="head-Quinta">Quinta<br><span></span></h4>
+                    <div class="tasks-container"></div>
+                </div>
+                <div class="day-card span-2" id="dia-Sexta" data-diadasemana="Sexta">
+                    <h4 id="head-Sexta">Sexta<br><span></span></h4>
+                    <div class="tasks-container"></div>
+                </div>
+                <div class="day-card span-2" id="dia-Sábado" data-diadasemana="Sábado">
+                    <h4 id="head-Sábado">Sábado<br><span></span></h4>
+                    <div class="tasks-container"></div>
+                </div>
+                <div class="day-card span-2" id="dia-Domingo" data-diadasemana="Domingo">
+                    <h4 id="head-Domingo">Domingo<br><span></span></h4>
+                    <div class="tasks-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Matérias -->
+        <section class="materias-section">
+            <h3 style="font-size: 16px; margin-bottom: 15px;">MATÉRIAS:</h3>
+            
+            <div id="listaMaterias">
+                <!-- As matérias entram aqui dinamicamente -->
+            </div>
+            
+            <img src="icone-adicionar.png" class="icon-add" id="btnAdicionarMateria" style="margin-top: 10px; cursor: pointer; width: 25px;">
+        </section>
+
+        <!-- Painel Direito e Lixeira -->
+        <aside class="right-panel">
+            <div class="top-buttons">
+                <button class="action-btn active-page">Calendário de tarefas</button>
+                <button class="action-btn" onclick="window.location.href='cadastro-tarefas.html'">Cadastro de tarefas e checklist de etapas</button>
+                <button class="action-btn" onclick="window.location.href='avaliacoes.html'">Avaliações</button>
+            </div>
+            
+            <div class="delete-zone" style="margin-top: 40px; text-align: center;">
+                <img src="icone-lixeira.png" alt="Lixeira" id="btnLixeira" style="width: 50px; cursor: pointer; margin-bottom: 20px; transition: transform 0.2s;">
+                <div class="confirm-box" style="border: 2px solid #000; padding: 5px; width: 100%; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <img src="icone-check.png" id="btnConfirmarExclusao" style="width: 25px; cursor: pointer;">
+                </div>
+            </div>
+            
+            <img src="gato-preto.png" alt="Mascote Gato Preto" style="width: 120px; align-self: flex-end; margin-top: auto;">
+        </aside>
+
+    </div>
+
+    <script src="estudos.js"></script>
+</body>
+</html>

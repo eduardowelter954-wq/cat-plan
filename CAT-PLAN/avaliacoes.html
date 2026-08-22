@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat-Plan - Avaliações</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container" style="max-width: 1400px;">
+        
+        <!-- Menu Lateral -->
+        <nav class="sidebar">
+            <button class="menu-btn tarefas" onclick="window.location.href='dashboard.html'">Tarefas</button>
+            <button class="menu-btn active estudos" onclick="window.location.href='estudos.html'">Estudos</button>
+            <button class="menu-btn financas">Finanças</button>
+            <button class="menu-btn organizacao">Organização</button>
+            <button class="menu-btn hobby">Hobby</button>
+        </nav>
+
+        <!-- Área Central (Avaliações) -->
+        <section class="avaliacoes-layout" style="flex-grow: 1; padding: 20px; display: flex; flex-direction: column;">
+            
+            <!-- Botão Adicionar -->
+            <img src="icone-adicionar.png" alt="Adicionar" id="btnNovaAvaliacao" style="width: 25px; cursor: pointer; margin-bottom: 20px; transition: transform 0.2s;">
+            
+            <!-- Formulário Oculto (Aparece ao clicar no +) -->
+            <div class="card card-avaliacao" id="formAvaliacao" style="display: none; border-style: dashed; margin-bottom: 20px; width: 300px;">
+                <input type="text" id="avDescricao" placeholder="Descrição da Avaliação" class="input-edicao" style="font-weight: bold; margin-bottom: 10px;">
+                <input type="text" id="avMateria" placeholder="Professor - Matéria" class="input-edicao" style="margin-bottom: 15px;">
+                
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+                    <input type="number" id="avTirada" placeholder="Nota tirada" class="input-edicao" style="width: 50%;">
+                    <span>/</span>
+                    <input type="number" id="avMaxima" placeholder="Nota máxima" class="input-edicao" style="width: 50%;">
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button id="btnCancelarAv" style="padding: 5px 10px; cursor: pointer;">Cancelar</button>
+                    <img src="icone-check.png" id="btnSalvarAv" style="width: 25px; cursor: pointer;" title="Salvar">
+                </div>
+            </div>
+
+            <!-- Lista de Cartões de Avaliação -->
+            <div id="containerAvaliacoes" style="display: flex; flex-wrap: wrap; gap: 20px;">
+                <!-- Os cartões entrarão aqui -->
+            </div>
+
+        </section>
+
+        <!-- Painel Direito -->
+        <aside class="right-panel">
+            <div class="top-buttons">
+                <button class="action-btn" onclick="window.location.href='estudos.html'">Calendário de tarefas</button>
+                <button class="action-btn" onclick="window.location.href='cadastro-tarefas.html'">Cadastro de tarefas e checklist de etapas</button>
+                <button class="action-btn active-page">Avaliações</button>
+            </div>
+            
+            <!-- Caixa da Média Total -->
+            <div class="card media-total-card" style="margin-top: 30px; text-align: center; width: 100%; padding: 20px 10px;">
+                <h4 style="margin-bottom: 10px; font-size: 15px;">Média total:</h4>
+                <p id="displayMediaTotal" style="font-size: 24px; font-weight: normal;">0.0/10</p>
+            </div>
+            
+        </aside>
+
+    </div>
+
+    <script src="avaliacoes.js"></script>
+</body>
+</html>

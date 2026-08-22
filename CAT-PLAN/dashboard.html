@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat-Plan - Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <!-- Menu Lateral -->
+        <nav class="sidebar">
+            <button class="menu-btn active tarefas">Tarefas</button>
+            <button class="menu-btn estudos" onclick="window.location.href='estudos.html'">Estudos</button>
+            <button class="menu-btn financas">Finanças</button>
+            <button class="menu-btn organizacao">Organização</button>
+            <button class="menu-btn hobby">Hobby</button>
+        </nav>
+
+        <!-- Painel de Cartões -->
+        <section class="cards-section">
+            
+            <!-- Cartão 1: Rotina -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Rotina</h3>
+                    <!-- Botão de editar rotina (Lápis) -->
+                    <img src="icone-editar.png" alt="Editar" class="icon-edit" id="btnEditarRotina" title="Ativar modo edição" style="cursor: pointer;">
+                </div>
+                
+                <!-- Lista dinâmica de Rotinas -->
+                <ul class="task-list" id="listaRotina"></ul>
+                
+                <!-- Campo para adicionar nova rotina -->
+                <div class="input-area">
+                    <textarea id="novaRotinaInput" placeholder="Ex: Turno no suporte técnico"></textarea>
+                </div>
+                
+                <div class="card-footer">
+                    <img src="icone-adicionar.png" alt="Adicionar" class="icon-add" id="btnAdicionarRotina" style="cursor: pointer;">
+                </div>
+            </div>
+
+            <!-- Cartão 2: Tarefa para o dia -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Tarefa para o dia</h3>
+                </div>
+                
+                <!-- Lista onde as tarefas dinâmicas vão aparecer -->
+                <ul class="task-list" id="listaTarefasHoje"></ul>
+                
+                <!-- O campo para digitar a nova tarefa -->
+                <div class="input-area">
+                    <textarea id="novaTarefaInput" placeholder="Exemplo."></textarea>
+                </div>
+                
+                <div class="card-footer">
+                    <img src="icone-adicionar.png" alt="Adicionar" class="icon-add" id="btnAdicionarTarefa" style="cursor: pointer;">
+                </div>
+            </div>
+            
+        </section>
+
+<!-- Navegação de Data e Checklists -->
+        <section class="main-content">
+            
+            <div class="date-navigation" style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+                <!-- Botão de voltar o dia -->
+                <button class="arrow-btn" id="btnDiaAnterior"><img src="seta-esquerda.png" alt="Anterior"></button>
+                
+                <div class="date-display" style="display: flex; align-items: center; gap: 10px;">
+                    <h2 id="currentDate" style="margin: 0;">21/08/2026</h2>
+                    
+                    <!-- O truque do calendário: O input fica invisível EXATAMENTE em cima do ícone -->
+                    <div style="position: relative; width: 35px; height: 35px;">
+                        <img src="icone-calendario.png" alt="Calendário" class="calendar-icon" style="width: 100%; height: 100%; object-fit: contain;">
+                        <!-- Input invisível clicável -->
+                        <input type="date" id="calendarioPicker" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
+                    </div>
+                </div>
+                
+                <!-- Botão de avançar o dia -->
+                <button class="arrow-btn" id="btnDiaSeguinte"><img src="seta-direita.png" alt="Próximo"></button>
+            </div>
+
+            <!-- Legenda visual e Filtros -->
+            <div class="checklist" style="display: flex; justify-content: center; gap: 20px; margin-top: 15px;">
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                    <input type="checkbox" id="filtroRotina" checked> ROTINA
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                    <input type="checkbox" id="filtroCompromisso" checked> COMPROMISSO
+                </label>
+            </div>
+            
+        </section>
+
+        <!-- Botões Superiores Direitos e Mascote -->
+        <aside class="right-panel">
+            <div class="top-buttons">
+                <button class="action-btn active-page">Tarefas diárias e rotina</button>
+                <button class="action-btn" onclick="window.location.href='compromissos.html'">Compromissos</button>
+            </div>
+            
+            <img src="gato-lendo.png" alt="Gato lendo" class="mascot-reading">
+        </aside>
+
+    </div>
+    
+    <!-- Link para a lógica principal -->
+    <script src="dashboard.js"></script>
+</body>
+</html>
