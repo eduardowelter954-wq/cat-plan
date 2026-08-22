@@ -16,9 +16,16 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (response.ok) {
+            // 1. Salva o nome do usuário logado
+            localStorage.setItem('usuarioLogado', username);
+
+            // 2. Se a conta já possui dados salvos no Supabase, atualiza o navegador
+            if (data.dados) {
+                localStorage.setItem('catPlanDados', JSON.stringify(data.dados));
+            }
+
             alert("Miau! Bem-vindo ao Cat-Plan!");
-            // Redireciona ou faz algo após o sucesso
-            window.location.href = "dashboard.html"; // ou a sua página principal
+            window.location.href = "dashboard.html"; // Redireciona para o painel
         } else {
             alert(data.mensagem || "Erro ao entrar.");
         }
