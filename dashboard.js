@@ -1,31 +1,37 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // --- 0. SINCRONIZAÇÃO COM A NUVEM (DESEMPACOTAR DADOS) ---
-    // Verifica se veio um pacote de dados do login e espalha para o dashboard
+// --- 0. SUPER SINCRONIZAÇÃO COM A NUVEM ---
+    
+    // 1. Desempacota TUDO que vem da nuvem (Rotinas, avaliações, checklists, etc)
     const nuvemDados = localStorage.getItem('catPlanDados');
     if (nuvemDados) {
         const dadosParsed = JSON.parse(nuvemDados);
-        if (dadosParsed.rotinasGlobal) localStorage.setItem('catPlanRotinasGlobal', JSON.stringify(dadosParsed.rotinasGlobal));
-        if (dadosParsed.rotinasChecks) localStorage.setItem('catPlanRotinasChecks', JSON.stringify(dadosParsed.rotinasChecks));
-        if (dadosParsed.compromissos) localStorage.setItem('catPlanCompromissos', JSON.stringify(dadosParsed.compromissos));
-        if (dadosParsed.tarefasDiarias) localStorage.setItem('catPlanTarefasDiarias', JSON.stringify(dadosParsed.tarefasDiarias));
-        
-        // Remove o pacote temporário para não sobrescrever edições locais futuras
+        for (const [chave, valor] of Object.entries(dadosParsed)) {
+            // Salva cada item no navegador exatamente como estava
+            localStorage.setItem(chave, typeof valor === 'string' ? valor : JSON.stringify(valor));
+        }
+        // Remove o pacote temporário após desempacotar
         localStorage.removeItem('catPlanDados');
     }
 
-    // Função para enviar os dados atualizados para a nuvem
+    // 2. Função inteligente para enviar TODOS os dados para a nuvem
     async function sincronizarComNuvem() {
         const username = localStorage.getItem('usuarioLogado');
         if (!username) return; 
 
-        // Empacota todas as suas chaves do localStorage para mandar pro banco
-        const dadosAtuais = {
-            rotinasGlobal: JSON.parse(localStorage.getItem('catPlanRotinasGlobal')) || [],
-            rotinasChecks: JSON.parse(localStorage.getItem('catPlanRotinasChecks')) || {},
-            compromissos: JSON.parse(localStorage.getItem('catPlanCompromissos')) || [],
-            tarefasDiarias: JSON.parse(localStorage.getItem('catPlanTarefasDiarias')) || {}
-        };
+        // Pega TODAS as chaves do seu localStorage automaticamente
+        const dadosAtuais = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const chave = localStorage.key(i);
+            // Ignora apenas os dados de quem está logado e o pacote temporário
+            if (chave !== 'usuarioLogado' && chave !== 'catPlanDados') {
+                try {
+                    dadosAtuais[chave] = JSON.parse(localStorage.getItem(chave));
+                } catch(e) {
+                    dadosAtuais[chave] = localStorage.getItem(chave);
+                }
+            }
+        }
 
         try {
             await fetch('https://cat-plan.onrender.com/api/dados', {
@@ -36,12 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     dados_do_site: dadosAtuais 
                 })
             });
-            console.log("Miau! Dados sincronizados com o Supabase com sucesso!");
+            console.log("Miau! TODOS os dados do Cat-Plan sincronizados com sucesso!");
         } catch (error) {
             console.error("Erro ao sincronizar com a nuvem:", error);
         }
     }
-
 
     // --- VARIÁVEIS DE TEMPO E ELEMENTOS ---
     let dataAtual = new Date(); 
