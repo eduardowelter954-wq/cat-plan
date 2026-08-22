@@ -1,3 +1,4 @@
+console.log("O script de login carregou com sucesso!");
 document.addEventListener("DOMContentLoaded", () => {
     verificarSessao();
 
