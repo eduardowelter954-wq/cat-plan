@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat-Plan - Cadastro de Tarefas</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container" style="max-width: 1400px;">
+        
+        <!-- COLUNA 1: Menu Lateral -->
+        <nav class="sidebar">
+            <button class="menu-btn tarefas" onclick="window.location.href='dashboard.html'">Tarefas</button>
+            <button class="menu-btn active estudos" onclick="window.location.href='estudos.html'">Estudos</button>
+            <button class="menu-btn financas">Finanças</button>
+            <button class="menu-btn organizacao">Organização</button>
+            <button class="menu-btn hobby">Hobby</button>
+        </nav>
+
+        <!-- COLUNA 2 e 3: Área de Cadastro e Lista -->
+        <section class="cadastro-layout">
+            
+            <!-- Formulário de Cadastro Único -->
+            <div class="area-formulario">
+                <img src="icone-adicionar.png" alt="Adicionar Nova" class="icon-add" style="margin-bottom: 10px; width: 20px;">
+                
+                <div class="card form-cadastro">
+                    <input type="text" id="materiaInput" placeholder="MATÉRIA" class="input-titulo-materia">
+                    <input type="text" id="tituloTarefaInput" placeholder="Título do Trabalho / Tarefa" class="input-titulo-materia" style="font-size: 13px; font-weight: normal;">
+                    <textarea id="descPassoInput" placeholder="Descrição do passo a passo (etapa)"></textarea>
+                    <input type="date" id="dataPassoInput" class="input-data-sutil">
+                    
+                    <div class="form-footer">
+                        <div class="prioridade-seletores">
+                            <div class="bola-prioridade verde active" data-cor="verde" title="Baixa"></div>
+                            <div class="bola-prioridade laranja" data-cor="laranja" title="Média"></div>
+                            <div class="bola-prioridade vermelha" data-cor="vermelha" title="Alta"></div>
+                        </div>
+                        <img src="icone-check.png" alt="Salvar" class="icon-check-save" id="btnSalvarPasso">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Tarefas -->
+            <div class="area-lista-tarefas" id="containerListaTarefas"></div>
+        </section>
+
+        <!-- COLUNA 4: Painel Direito -->
+        <aside class="right-panel">
+            <div class="top-buttons">
+                <button class="action-btn" onclick="window.location.href='estudos.html'">Calendário de tarefas</button>
+                <button class="action-btn active-page">Cadastro de tarefas e checklist de etapas</button>
+                <button class="action-btn">Avaliações</button>
+            </div>
+            
+            <img src="gato-preto.png" alt="Mascote" style="width: 140px; align-self: flex-end; margin-top: auto;">
+        </aside>
+
+    </div>
+
+    <script src="cadastro-tarefas.js"></script>
+</body>
+</html>
