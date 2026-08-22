@@ -1,5 +1,48 @@
 document.addEventListener("DOMContentLoaded", () => {
     
+    // --- 0. SINCRONIZAÇÃO COM A NUVEM (DESEMPACOTAR DADOS) ---
+    // Verifica se veio um pacote de dados do login e espalha para o dashboard
+    const nuvemDados = localStorage.getItem('catPlanDados');
+    if (nuvemDados) {
+        const dadosParsed = JSON.parse(nuvemDados);
+        if (dadosParsed.rotinasGlobal) localStorage.setItem('catPlanRotinasGlobal', JSON.stringify(dadosParsed.rotinasGlobal));
+        if (dadosParsed.rotinasChecks) localStorage.setItem('catPlanRotinasChecks', JSON.stringify(dadosParsed.rotinasChecks));
+        if (dadosParsed.compromissos) localStorage.setItem('catPlanCompromissos', JSON.stringify(dadosParsed.compromissos));
+        if (dadosParsed.tarefasDiarias) localStorage.setItem('catPlanTarefasDiarias', JSON.stringify(dadosParsed.tarefasDiarias));
+        
+        // Remove o pacote temporário para não sobrescrever edições locais futuras
+        localStorage.removeItem('catPlanDados');
+    }
+
+    // Função para enviar os dados atualizados para a nuvem
+    async function sincronizarComNuvem() {
+        const username = localStorage.getItem('usuarioLogado');
+        if (!username) return; 
+
+        // Empacota todas as suas chaves do localStorage para mandar pro banco
+        const dadosAtuais = {
+            rotinasGlobal: JSON.parse(localStorage.getItem('catPlanRotinasGlobal')) || [],
+            rotinasChecks: JSON.parse(localStorage.getItem('catPlanRotinasChecks')) || {},
+            compromissos: JSON.parse(localStorage.getItem('catPlanCompromissos')) || [],
+            tarefasDiarias: JSON.parse(localStorage.getItem('catPlanTarefasDiarias')) || {}
+        };
+
+        try {
+            await fetch('https://cat-plan.onrender.com/api/dados', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    username: username, 
+                    dados_do_site: dadosAtuais 
+                })
+            });
+            console.log("Miau! Dados sincronizados com o Supabase com sucesso!");
+        } catch (error) {
+            console.error("Erro ao sincronizar com a nuvem:", error);
+        }
+    }
+
+
     // --- VARIÁVEIS DE TEMPO E ELEMENTOS ---
     let dataAtual = new Date(); 
     
@@ -65,6 +108,8 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem('catPlanRotinasGlobal', JSON.stringify(rotinas));
             inputRotina.value = "";
             carregarRotinasECompromissos(displayData.innerText);
+            
+            sincronizarComNuvem(); // AVISA A NUVEM!
         }
     });
 
@@ -145,6 +190,8 @@ document.addEventListener("DOMContentLoaded", () => {
         else checksPorDia[dataStr].push(idRotina);
         localStorage.setItem('catPlanRotinasChecks', JSON.stringify(checksPorDia));
         carregarRotinasECompromissos(dataStr); 
+        
+        sincronizarComNuvem(); // AVISA A NUVEM!
     }
 
     window.excluirRotina = function(idRotina) {
@@ -153,6 +200,8 @@ document.addEventListener("DOMContentLoaded", () => {
             rotinas = rotinas.filter(r => r.id !== idRotina);
             localStorage.setItem('catPlanRotinasGlobal', JSON.stringify(rotinas));
             carregarRotinasECompromissos(displayData.innerText);
+            
+            sincronizarComNuvem(); // AVISA A NUVEM!
         }
     }
 
@@ -163,6 +212,8 @@ document.addEventListener("DOMContentLoaded", () => {
             todosCompromissos[index].concluido = !todosCompromissos[index].concluido;
             localStorage.setItem('catPlanCompromissos', JSON.stringify(todosCompromissos));
             carregarRotinasECompromissos(dataStr);
+            
+            sincronizarComNuvem(); // AVISA A NUVEM!
         }
     }
 
@@ -179,6 +230,8 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem('catPlanTarefasDiarias', JSON.stringify(todasTarefas));
             inputTarefa.value = "";
             carregarTarefas(dataStr);
+            
+            sincronizarComNuvem(); // AVISA A NUVEM!
         }
     });
 
@@ -217,6 +270,8 @@ document.addEventListener("DOMContentLoaded", () => {
             todasTarefas[dataStr] = tarefasHoje;
             localStorage.setItem('catPlanTarefasDiarias', JSON.stringify(todasTarefas));
             carregarTarefas(dataStr);
+            
+            sincronizarComNuvem(); // AVISA A NUVEM!
         }
     }
 
@@ -227,6 +282,8 @@ document.addEventListener("DOMContentLoaded", () => {
         todasTarefas[dataStr] = tarefasHoje;
         localStorage.setItem('catPlanTarefasDiarias', JSON.stringify(todasTarefas));
         carregarTarefas(dataStr);
+        
+        sincronizarComNuvem(); // AVISA A NUVEM!
     }
 
     // Inicia a tela desenhando o dia atual!
