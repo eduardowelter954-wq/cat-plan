@@ -1,73 +1,72 @@
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("O script de login carregou com sucesso e o HTML está pronto!");
-    verificarSessao();
+const express = require('express');
+const cors = require('cors');
+const { createClient } = require('@supabase/supabase-js');
 
-    const loginForm = document.getElementById('loginForm');
-    
-    // Segurança para avisar se o ID estiver errado no HTML
-    if (!loginForm) {
-        console.error("ERRO: O elemento com o id 'loginForm' não foi encontrado no HTML!");
-        return;
-    }
+const app = express();
 
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault(); 
-        console.log("Formulário enviado! Disparando requisição...");
-        
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        
-        if (username.trim() !== "" && password.trim() !== "") {
-            try {
-                const resposta = await fetch('https://cat-plan.onrender.com/api/auth', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password })
-                });
+app.use(cors());
+app.use(express.json());
 
-                const dados = await resposta.json();
-                console.log('Resposta do servidor:', dados.mensagem);
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
-                iniciarSessao(username);
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-            } catch (erro) {
-                console.error('Erro ao conectar com o servidor:', erro);
-                alert('Não foi possível conectar ao servidor na nuvem. Verifique sua internet ou o status do Render.');
-            }
-        }
-    });
+app.get('/', (req, res) => {
+    res.send('Servidor do Cat-Plan conectado ao Supabase! 🐈‍⬛');
 });
 
-function iniciarSessao(username) {
-    const dataAtual = new Date();
-    const dataExpiracao = dataAtual.getTime() + (45 * 24 * 60 * 60 * 1000); 
+app.post('/api/auth', async (req, res) => {
+    const { username, password } = req.body;
 
-    const sessao = {
-        usuario: username,
-        expiraEm: dataExpiracao
-    };
-
-    localStorage.setItem('catPlanSessao', JSON.stringify(sessao));
-    alert(`Miau! Bem-vindo, ${username}. Login realizado com sucesso!`);
-    
-    window.location.href = "dashboard.html"; 
-}
-
-function verificarSessao() {
-    const sessaoSalva = localStorage.getItem('catPlanSessao');
-    
-    if (sessaoSalva) {
-        const sessao = JSON.parse(sessaoSalva);
-        const dataAtual = new Date().getTime();
-        
-        if (dataAtual < sessao.expiraEm) {
-            console.log("Usuário já está logado!");
-            window.location.href = "dashboard.html"; 
-        } else {
-            console.log("Sessão expirou.");
-            localStorage.removeItem('catPlanSessao'); 
-        }
+    if (!username || !password) {
+        return res.status(400).json({ mensagem: "Usuário e senha são obrigatórios!" });
     }
-}
+
+    try {
+        console.log(`Buscando usuário no Supabase: ${username}`);
+        
+        // Usamos .maybeSingle() em vez de .single() para não dar erro se o usuário não existir
+        const { data: usuarioExistente, error: erroBusca } = await supabase
+            .from('usuarios')
+            .select('*')
+            .eq('username', username)
+            .maybeSingle();
+
+        if (erroBusca) {
+            console.error('Erro ao buscar no Supabase:', erroBusca);
+            return res.status(500).json({ mensagem: "Erro ao consultar banco de dados." });
+        }
+
+        if (usuarioExistente) {
+            if (usuarioExistente.password === password) {
+                console.log(`Login bem-sucedido para: ${username}`);
+                return res.json({ mensagem: "Login realizado com sucesso!", status: "ok" });
+            } else {
+                return res.status(401).json({ mensagem: "Senha incorreta!" });
+            }
+        } else {
+            console.log(`Usuário não encontrado. Criando novo cadastro para: ${username}`);
+            
+            const { error: erroInsercao } = await supabase
+                .from('usuarios')
+                .insert([{ username, password }]);
+
+            if (erroInsercao) {
+                console.error('Erro ao inserir no Supabase:', erroInsercao);
+                return res.status(500).json({ mensagem: "Erro ao salvar novo usuário." });
+            }
+
+            console.log(`Novo usuário cadastrado com sucesso: ${username}`);
+            return res.json({ mensagem: "Cadastro realizado com sucesso!", status: "ok" });
+        }
+    } catch (error) {
+        console.error('Erro crítico no servidor:', error);
+        res.status(500).json({ mensagem: "Erro interno no servidor." });
+    }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}! 🐈‍⬛`);
+});
