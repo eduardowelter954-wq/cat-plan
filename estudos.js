@@ -1,5 +1,37 @@
 document.addEventListener("DOMContentLoaded", () => {
     
+    // --- 0. SUPER SINCRONIZAÇÃO COM A NUVEM ---
+    async function sincronizarComNuvem() {
+        const username = localStorage.getItem('usuarioLogado');
+        if (!username) return; 
+
+        const dadosAtuais = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const chave = localStorage.key(i);
+            if (chave !== 'usuarioLogado' && chave !== 'catPlanDados') {
+                try {
+                    dadosAtuais[chave] = JSON.parse(localStorage.getItem(chave));
+                } catch(e) {
+                    dadosAtuais[chave] = localStorage.getItem(chave);
+                }
+            }
+        }
+
+        try {
+            await fetch('https://cat-plan.onrender.com/api/dados', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    username: username, 
+                    dados_do_site: dadosAtuais 
+                })
+            });
+            console.log("Miau! Estudos sincronizados com sucesso!");
+        } catch (error) {
+            console.error("Erro ao sincronizar com a nuvem:", error);
+        }
+    }
+
     // --- LÓGICA DO CALENDÁRIO ---
     let dataReferencia = new Date(); // Começa no dia de hoje
     const diasDaSemanaNome = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
@@ -20,7 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     function atualizarCalendario() {
-        // Encontra a Segunda-feira da semana atual
         const diaSemana = dataReferencia.getDay();
         const diferencaParaSegunda = dataReferencia.getDate() - diaSemana + (diaSemana === 0 ? -6 : 1);
         const segundaFeira = new Date(dataReferencia.setDate(diferencaParaSegunda));
@@ -28,7 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         mesAnoDisplay.innerText = `${meses[segundaFeira.getMonth()]} ${segundaFeira.getFullYear()}`;
 
-        // Preenche as datas da Segunda até Domingo na tela
         for (let i = 0; i < 7; i++) {
             let dataAtual = new Date(segundaFeira);
             dataAtual.setDate(segundaFeira.getDate() + i);
@@ -36,7 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const diaStr = formatarData(dataAtual);
             const nomeDia = diasDaSemanaNome[dataAtual.getDay()];
             
-            // Atualiza o texto e guarda a data real no elemento HTML
             const cardDia = document.getElementById(`dia-${nomeDia}`);
             const headDia = document.getElementById(`head-${nomeDia}`);
             
@@ -46,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
         
-        carregarTudo(); // Recarrega tarefas sempre que a semana muda
+        carregarTudo(); 
     }
 
     function formatarData(data) {
@@ -77,6 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
         materias.push(novaMateria);
         localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
         carregarTudo();
+        sincronizarComNuvem(); // Sincroniza nova matéria
     });
 
     function desenharMaterias() {
@@ -93,10 +123,36 @@ document.addEventListener("DOMContentLoaded", () => {
                     <br><span style="font-size: 12px;">Dias: ${mat.dias || 'Não definido'}</span>
                 </div>
             `;
-            // Se o modo lixeira estiver ativo, permite selecionar
-            matDiv.addEventListener('click', (e) => selecionarMateriaParaExcluir(e, mat.nome));
+            // NOVA LÓGICA: Se a lixeira estiver ligada, seleciona para apagar. Se estiver desligada, permite editar!
+            matDiv.addEventListener('click', (e) => {
+                if (modoExclusao) {
+                    selecionarMateriaParaExcluir(e, mat.nome);
+                } else {
+                    editarMateria(mat.nome);
+                }
+            });
             listaMaterias.appendChild(matDiv);
         });
+    }
+
+    // Função que permite editar os dias e o professor
+    function editarMateria(nomeMateria) {
+        let materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
+        const index = materias.findIndex(m => m.nome === nomeMateria);
+        
+        if (index !== -1) {
+            const novoProf = prompt(`Editar professor(a) de ${nomeMateria}:`, materias[index].professor || '');
+            if (novoProf !== null) {
+                const novoDias = prompt(`Editar dias da aula (Ex: Segunda, Quarta):`, materias[index].dias || '');
+                if (novoDias !== null) {
+                    materias[index].professor = novoProf;
+                    materias[index].dias = novoDias;
+                    localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
+                    carregarTudo();
+                    sincronizarComNuvem();
+                }
+            }
+        }
     }
 
 
@@ -104,50 +160,42 @@ document.addEventListener("DOMContentLoaded", () => {
     function carregarTudo() {
         desenharMaterias();
         
-        // Limpa todas as caixas de tarefas e a área azul
         document.querySelectorAll('.tasks-container').forEach(c => c.innerHTML = "");
         const areaEspera = document.getElementById('areaEspera');
-        // Mantém apenas o parágrafo de texto da área de espera
         areaEspera.innerHTML = `<p style="color: #fff; opacity: 0.7; text-align: center; margin-top: 15px; width: 100%;">Solte tarefas aqui para levar para outra semana</p>`;
 
         const tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
         const materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
 
         tarefas.forEach(tarefa => {
-            if (tarefa.concluida) return; // Se quiser esconder as concluídas
+            if (tarefa.concluida) return; 
 
             const divTarefa = document.createElement('div');
             divTarefa.className = 'tarefa-arrastavel';
             divTarefa.draggable = true;
             divTarefa.id = `tarefa-${tarefa.id}`;
-            // A cor acompanha a prioridade!
             if(tarefa.prioridade === 'verde') divTarefa.style.backgroundColor = '#d4edda';
             if(tarefa.prioridade === 'laranja') divTarefa.style.backgroundColor = '#ffeeba';
             if(tarefa.prioridade === 'vermelha') divTarefa.style.backgroundColor = '#f8d7da';
             
             divTarefa.innerHTML = `<strong>${tarefa.materia}</strong><br>${tarefa.descricao}`;
 
-            // Drag Start
             divTarefa.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('text/plain', tarefa.id);
                 setTimeout(() => divTarefa.style.opacity = '0.5', 0);
             });
             divTarefa.addEventListener('dragend', () => divTarefa.style.opacity = '1');
 
-            // Onde essa tarefa deve aparecer?
             if (tarefa.data === "ESPERA") {
                 areaEspera.appendChild(divTarefa);
             } 
             else if (tarefa.data === "00/00/0000") {
-                // Tarefa sem data. Procura os dias da matéria.
                 const matVinculada = materias.find(m => m.nome === tarefa.materia);
                 if (matVinculada && matVinculada.dias) {
                     const diasAula = matVinculada.dias.toLowerCase();
-                    // Coloca visualmente nos dias da semana que a aula ocorre
                     diasDaSemanaNome.forEach(diaSemana => {
                         if (diasAula.includes(diaSemana.toLowerCase())) {
                             const container = document.querySelector(`#dia-${diaSemana} .tasks-container`);
-                            // Clonamos o node porque uma tarefa sem data pode aparecer em dois dias (ex: Terça e Quinta)
                             const clone = divTarefa.cloneNode(true);
                             clone.addEventListener('dragstart', (e) => {
                                 e.dataTransfer.setData('text/plain', tarefa.id);
@@ -160,7 +208,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             } 
             else {
-                // Tarefa com data fixa. Verifica se a data está visível nesta semana.
                 const cardDoDia = document.querySelector(`.day-card[data-data="${tarefa.data}"] .tasks-container`);
                 if (cardDoDia) {
                     cardDoDia.appendChild(divTarefa);
@@ -169,7 +216,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Configura as Zonas onde podemos soltar as tarefas
     const zonasDeSoltura = [document.getElementById('areaEspera'), ...document.querySelectorAll('.day-card')];
     
     zonasDeSoltura.forEach(zona => {
@@ -191,18 +237,16 @@ document.addEventListener("DOMContentLoaded", () => {
             const index = tarefas.findIndex(t => t.id.toString() === idTarefa);
             
             if (index !== -1) {
-                // Se soltou na área azul
                 if (zona.id === 'areaEspera') {
                     tarefas[index].data = "ESPERA";
-                } 
-                // Se soltou em um dia do calendário
-                else {
+                } else {
                     const novaData = zona.getAttribute('data-data');
                     if (novaData) tarefas[index].data = novaData;
                 }
                 
                 localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
-                carregarTudo(); // Redesenha a tela inteira atualizada
+                carregarTudo(); 
+                sincronizarComNuvem(); // Sincroniza o movimento da tarefa
             }
         });
     });
@@ -234,12 +278,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     btnConfirmar.addEventListener('click', () => {
         if (modoExclusao && materiaParaExcluir) {
-            // 1. Remove a matéria
             let materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
             materias = materias.filter(m => m.nome !== materiaParaExcluir);
             localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
 
-            // 2. Renomeia as tarefas vinculadas
             let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
             tarefas.forEach(t => {
                 if (t.materia === materiaParaExcluir) {
@@ -250,6 +292,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             desligarLixeira();
             carregarTudo();
+            sincronizarComNuvem(); // Sincroniza a exclusão
         }
     });
 
