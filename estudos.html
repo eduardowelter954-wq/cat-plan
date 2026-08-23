@@ -25,20 +25,22 @@
                 <p style="color: #fff; opacity: 0.7; text-align: center; margin-top: 15px; width: 100%;">Solte tarefas aqui para levar para outra semana</p>
             </div>
             
-  <div class="date-navigation" style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 15px;">
-                <button class="arrow-btn" id="btnSemanaAnterior"><img src="seta-esquerda.png" alt="Anterior"></button>
+            <div class="date-navigation" style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 15px;">
                 
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <!-- O truque do calendário invisível -->
-                    <div style="position: relative; width: 35px; height: 35px;">
-                        <img src="icone-calendario.png" alt="Calendário" class="calendar-icon" style="width: 100%; height: 100%; object-fit: contain;">
-                        <input type="date" id="calendarioPicker" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
-                    </div>
-                    
+                <!-- Linha 1: Setas e Data (Mês/Ano) -->
+                <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+                    <button class="arrow-btn" id="btnSemanaAnterior"><img src="seta-esquerda.png" alt="Anterior"></button>
                     <span id="mesAnoDisplay" style="font-weight: bold; font-size: 16px; text-transform: uppercase;">MÊS ANO</span>
+                    <button class="arrow-btn" id="btnSemanaProxima"><img src="seta-direita.png" alt="Próximo"></button>
                 </div>
                 
-                <button class="arrow-btn" id="btnSemanaProxima"><img src="seta-direita.png" alt="Próximo"></button>
+                <!-- Linha 2: Ícone do Calendário Centralizado Embaixo -->
+                <div style="position: relative; width: 35px; height: 35px;">
+                    <img src="icone-calendario.png" alt="Calendário" class="calendar-icon" style="width: 100%; height: 100%; object-fit: contain;">
+                    <!-- Input invisível clicável -->
+                    <input type="date" id="calendarioPicker" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
+                </div>
+                
             </div>
 
             <!-- Grade dos dias da semana -->
