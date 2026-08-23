@@ -128,30 +128,32 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (modoExclusao) {
                     selecionarMateriaParaExcluir(e, mat.nome);
                 } else {
-                    editarMateria(mat.nome);
-                }
-            });
-            listaMaterias.appendChild(matDiv);
-        });
-    }
-
-    // Função que permite editar os dias e o professor
-    function editarMateria(nomeMateria) {
+function editarMateria(nomeMateria) {
         let materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
         const index = materias.findIndex(m => m.nome === nomeMateria);
         
         if (index !== -1) {
-            const novoProf = prompt(`Editar professor(a) de ${nomeMateria}:`, materias[index].professor || '');
-            if (novoProf !== null) {
-                const novoDias = prompt(`Editar dias da aula (Ex: Segunda, Quarta):`, materias[index].dias || '');
-                if (novoDias !== null) {
-                    materias[index].professor = novoProf;
-                    materias[index].dias = novoDias;
-                    localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
-                    carregarTudo();
-                    sincronizarComNuvem();
-                }
-            }
+            // 1. Permite alterar o nome da matéria
+            const novoNome = prompt(`Editar nome da matéria:`, materias[index].nome);
+            if (novoNome === null) return;
+            
+            const nomeTratado = novoNome.trim().toUpperCase();
+
+            // 2. Permite alterar o professor
+            const novoProf = prompt(`Editar professor(a) de ${nomeTratado}:`, materias[index].professor || '');
+            if (novoProf === null) return;
+
+            // 3. Permite alterar os dias
+            const novoDias = prompt(`Editar dias da aula (Ex: Segunda, Quarta, Sábado):`, materias[index].dias || '');
+            if (novoDias === null) return;
+
+            materias[index].nome = nomeTratado;
+            materias[index].professor = novoProf;
+            materias[index].dias = novoDias;
+
+            localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
+            carregarTudo();
+            sincronizarComNuvem();
         }
     }
 
