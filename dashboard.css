@@ -675,25 +675,28 @@ body {
     opacity: 1;
 }
 
-/* Padroniza a bolinha de compromisso para roxo */
+/* Força a cor roxa na checkbox de compromissos */
 input[type="checkbox"].compromisso, 
 .compromisso-checkbox {
-    accent-color: #9b51e0; 
+    accent-color: #9b51e0 !important;
 }
 
-/* Corrige o alinhamento dos itens na lista de rotina/compromissos */
-.task-list li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
+/* Garante que os cards de avaliação tenham largura fixa e não quebrem o layout */
+#containerAvaliacoes {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 20px !important;
 }
 
-/* Organiza os cards de avaliações em uma grade firme */
-.avaliacoes-grid, .container-avaliacoes, section.avaliacoes-section {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
+.card-avaliacao {
+    width: 260px !important;
+    min-height: 150px !important;
+    background: #fff !important;
+    border: 1px solid #ddd !important;
+    border-radius: 8px !important;
+    padding: 15px !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+    box-sizing: border-box !important;
 }
 
 .card-avaliacao, .avaliacao-item {
