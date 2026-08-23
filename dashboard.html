@@ -66,17 +66,17 @@
         <!-- Navegação de Data e Checklists -->
         <section class="main-content">
             
-            <div class="date-navigation" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+<div class="date-navigation" style="display: flex; flex-direction: column !important; align-items: center !important; gap: 10px !important;">
                 
                 <!-- Linha 1: Setas e Data -->
                 <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
                     <button class="arrow-btn" id="btnDiaAnterior"><img src="seta-esquerda.png" alt="Anterior"></button>
-                    <h2 id="currentDate" style="margin: 0;">21/08/2026</h2>
+                    <h2 id="currentDate" style="margin: 0;">22/08/2026</h2>
                     <button class="arrow-btn" id="btnDiaSeguinte"><img src="seta-direita.png" alt="Próximo"></button>
                 </div>
                 
                 <!-- Linha 2: Ícone do Calendário Centralizado Embaixo -->
-                <div style="position: relative; width: 35px; height: 35px;">
+                <div style="position: relative; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center;">
                     <img src="icone-calendario.png" alt="Calendário" class="calendar-icon" style="width: 100%; height: 100%; object-fit: contain;">
                     <!-- Input invisível clicável -->
                     <input type="date" id="calendarioPicker" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
