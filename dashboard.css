@@ -689,3 +689,18 @@ input[type="checkbox"].compromisso,
     gap: 10px;
     margin-bottom: 8px;
 }
+
+/* Organiza os cards de avaliações em uma grade firme e responsiva */
+.avaliacoes-grid, .container-avaliacoes, section.avaliacoes-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.card-avaliacao, .avaliacao-item {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
