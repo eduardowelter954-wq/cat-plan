@@ -674,3 +674,18 @@ body {
 .btn-lixeira-card:hover {
     opacity: 1;
 }
+
+/* Padroniza a bolinha de compromisso para roxo */
+input[type="checkbox"].compromisso, 
+.passo-item.prioridade-roxo, 
+.compromisso-checkbox {
+    accent-color: #9b51e0; /* Tom de roxo combinando com o tema */
+}
+
+/* Corrige o alinhamento do texto e da bolinha de compromisso na rotina */
+.task-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
