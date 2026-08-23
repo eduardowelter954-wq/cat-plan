@@ -26,30 +26,33 @@ document.addEventListener("DOMContentLoaded", () => {
                     dados_do_site: dadosAtuais 
                 })
             });
-            console.log("Miau! Estudos sincronizados com sucesso!");
+            console.log("Miau! Sincronizado com sucesso!");
         } catch (error) {
             console.error("Erro ao sincronizar com a nuvem:", error);
         }
     }
 
     // --- LÓGICA DO CALENDÁRIO ---
-    let dataReferencia = new Date(); // Começa no dia de hoje
+    let dataReferencia = new Date();
     const diasDaSemanaNome = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
     
     const btnAnt = document.getElementById('btnSemanaAnterior');
     const btnProx = document.getElementById('btnSemanaProxima');
     const mesAnoDisplay = document.getElementById('mesAnoDisplay');
 
-    // Funções de navegação de data
-    btnAnt.addEventListener('click', () => {
-        dataReferencia.setDate(dataReferencia.getDate() - 7);
-        atualizarCalendario();
-    });
+    if (btnAnt) {
+        btnAnt.addEventListener('click', () => {
+            dataReferencia.setDate(dataReferencia.getDate() - 7);
+            atualizarCalendario();
+        });
+    }
 
-    btnProx.addEventListener('click', () => {
-        dataReferencia.setDate(dataReferencia.getDate() + 7);
-        atualizarCalendario();
-    });
+    if (btnProx) {
+        btnProx.addEventListener('click', () => {
+            dataReferencia.setDate(dataReferencia.getDate() + 7);
+            atualizarCalendario();
+        });
+    }
 
     function atualizarCalendario() {
         const diaSemana = dataReferencia.getDay();
@@ -57,7 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const segundaFeira = new Date(dataReferencia.setDate(diferencaParaSegunda));
 
         const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-        mesAnoDisplay.innerText = `${meses[segundaFeira.getMonth()]} ${segundaFeira.getFullYear()}`;
+        if (mesAnoDisplay) {
+            mesAnoDisplay.innerText = `${meses[segundaFeira.getMonth()]} ${segundaFeira.getFullYear()}`;
+        }
 
         for (let i = 0; i < 7; i++) {
             let dataAtual = new Date(segundaFeira);
@@ -89,27 +94,31 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnAddMateria = document.getElementById('btnAdicionarMateria');
     const listaMaterias = document.getElementById('listaMaterias');
 
-    btnAddMateria.addEventListener('click', () => {
-        const nome = prompt("Nome da Matéria (Ex: MATEMÁTICA):");
-        if (!nome) return;
-        const professor = prompt("Nome do(a) Professor(a):");
-        const dias = prompt("Dias da semana que tem essa aula (Ex: Segunda, Quarta):");
+    if (btnAddMateria) {
+        btnAddMateria.addEventListener('click', () => {
+            const nome = prompt("Nome da Matéria (Ex: MATEMÁTICA):");
+            if (!nome || nome.trim() === "") return;
+            
+            const professor = prompt("Nome do(a) Professor(a):") || "";
+            const dias = prompt("Dias da aula (Ex: Segunda, Quarta, Sábado, Domingo ou 'Nenhum'):") || "Nenhum";
 
-        const novaMateria = {
-            id: Date.now(),
-            nome: nome.trim().toUpperCase(),
-            professor: professor,
-            dias: dias
-        };
+            const novaMateria = {
+                id: Date.now(),
+                nome: nome.trim().toUpperCase(),
+                professor: professor.trim(),
+                dias: dias.trim()
+            };
 
-        const materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
-        materias.push(novaMateria);
-        localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
-        carregarTudo();
-        sincronizarComNuvem(); // Sincroniza nova matéria
-    });
+            const materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
+            materias.push(novaMateria);
+            localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
+            carregarTudo();
+            sincronizarComNuvem();
+        });
+    }
 
     function desenharMaterias() {
+        if (!listaMaterias) return;
         listaMaterias.innerHTML = "";
         const materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
         
@@ -123,33 +132,35 @@ document.addEventListener("DOMContentLoaded", () => {
                     <br><span style="font-size: 12px;">Dias: ${mat.dias || 'Não definido'}</span>
                 </div>
             `;
-            // NOVA LÓGICA: Se a lixeira estiver ligada, seleciona para apagar. Se estiver desligada, permite editar!
             matDiv.addEventListener('click', (e) => {
-                if (modoExclusao) {
+                if (window.modoExclusaoGlobal) {
                     selecionarMateriaParaExcluir(e, mat.nome);
                 } else {
-function editarMateria(nomeMateria) {
+                    editarMateria(mat.nome);
+                }
+            });
+            listaMaterias.appendChild(matDiv);
+        });
+    }
+
+    // Função de edição segura (permite mudar nome, professor e dias, incluindo sábados e domingos)
+    function editarMateria(nomeMateria) {
         let materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
         const index = materias.findIndex(m => m.nome === nomeMateria);
         
         if (index !== -1) {
-            // 1. Permite alterar o nome da matéria
             const novoNome = prompt(`Editar nome da matéria:`, materias[index].nome);
             if (novoNome === null) return;
             
-            const nomeTratado = novoNome.trim().toUpperCase();
-
-            // 2. Permite alterar o professor
-            const novoProf = prompt(`Editar professor(a) de ${nomeTratado}:`, materias[index].professor || '');
+            const novoProf = prompt(`Editar professor(a):`, materias[index].professor || '');
             if (novoProf === null) return;
 
-            // 3. Permite alterar os dias
-            const novoDias = prompt(`Editar dias da aula (Ex: Segunda, Quarta, Sábado):`, materias[index].dias || '');
+            const novoDias = prompt(`Editar dias (Ex: Segunda, Sábado, Domingo ou 'Nenhum'):`, materias[index].dias || '');
             if (novoDias === null) return;
 
-            materias[index].nome = nomeTratado;
-            materias[index].professor = novoProf;
-            materias[index].dias = novoDias;
+            materias[index].nome = novoNome.trim().toUpperCase() || materias[index].nome;
+            materias[index].professor = novoProf.trim();
+            materias[index].dias = novoDias.trim();
 
             localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
             carregarTudo();
@@ -164,7 +175,9 @@ function editarMateria(nomeMateria) {
         
         document.querySelectorAll('.tasks-container').forEach(c => c.innerHTML = "");
         const areaEspera = document.getElementById('areaEspera');
-        areaEspera.innerHTML = `<p style="color: #fff; opacity: 0.7; text-align: center; margin-top: 15px; width: 100%;">Solte tarefas aqui para levar para outra semana</p>`;
+        if (areaEspera) {
+            areaEspera.innerHTML = `<p style="color: #fff; opacity: 0.7; text-align: center; margin-top: 15px; width: 100%;">Solte tarefas aqui para levar para outra semana</p>`;
+        }
 
         const tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
         const materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
@@ -189,7 +202,7 @@ function editarMateria(nomeMateria) {
             divTarefa.addEventListener('dragend', () => divTarefa.style.opacity = '1');
 
             if (tarefa.data === "ESPERA") {
-                areaEspera.appendChild(divTarefa);
+                if (areaEspera) areaEspera.appendChild(divTarefa);
             } 
             else if (tarefa.data === "00/00/0000") {
                 const matVinculada = materias.find(m => m.nome === tarefa.materia);
@@ -221,6 +234,7 @@ function editarMateria(nomeMateria) {
     const zonasDeSoltura = [document.getElementById('areaEspera'), ...document.querySelectorAll('.day-card')];
     
     zonasDeSoltura.forEach(zona => {
+        if (!zona) return;
         zona.addEventListener('dragover', (e) => {
             e.preventDefault();
             zona.style.backgroundColor = 'rgba(0,0,0,0.05)';
@@ -248,64 +262,72 @@ function editarMateria(nomeMateria) {
                 
                 localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
                 carregarTudo(); 
-                sincronizarComNuvem(); // Sincroniza o movimento da tarefa
+                sincronizarComNuvem();
             }
         });
     });
 
 
-    // --- LÓGICA DA LIXEIRA (APAGAR MATÉRIA) ---
+    // --- LIXEIRA ---
     const btnLixeira = document.getElementById('btnLixeira');
     const btnConfirmar = document.getElementById('btnConfirmarExclusao');
-    let modoExclusao = false;
+    window.modoExclusaoGlobal = false;
     let materiaParaExcluir = null;
 
-    btnLixeira.addEventListener('click', () => {
-        modoExclusao = !modoExclusao;
-        if (modoExclusao) {
-            btnLixeira.style.transform = "scale(1.2)";
-            btnLixeira.style.filter = "drop-shadow(0 0 5px red)";
-        } else {
-            desligarLixeira();
-        }
-    });
+    if (btnLixeira) {
+        btnLixeira.addEventListener('click', () => {
+            window.modoExclusaoGlobal = !window.modoExclusaoGlobal;
+            if (window.modoExclusaoGlobal) {
+                btnLixeira.style.transform = "scale(1.2)";
+                btnLixeira.style.filter = "drop-shadow(0 0 5px red)";
+            } else {
+                desligarLixeira();
+            }
+        });
+    }
 
     function selecionarMateriaParaExcluir(e, nomeMateria) {
-        if (!modoExclusao) return;
-        
+        if (!window.modoExclusaoGlobal) return;
         document.querySelectorAll('.materia-item').forEach(m => m.classList.remove('selecionada-para-excluir'));
         e.currentTarget.classList.add('selecionada-para-excluir');
         materiaParaExcluir = nomeMateria;
     }
 
-    btnConfirmar.addEventListener('click', () => {
-        if (modoExclusao && materiaParaExcluir) {
-            let materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
-            materias = materias.filter(m => m.nome !== materiaParaExcluir);
-            localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
+    if (btnConfirmar) {
+        btnConfirmar.addEventListener('click', () => {
+            if (window.modoExclusaoGlobal && materiaParaExcluir) {
+                let materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
+                materias = materias.filter(m => m.nome !== materiaParaExcluir);
+                localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
 
-            let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
-            tarefas.forEach(t => {
-                if (t.materia === materiaParaExcluir) {
-                    t.materia = "MATÉRIA APAGADA";
-                }
-            });
-            localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
+                let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
+                tarefas.forEach(t => {
+                    if (t.materia === materiaParaExcluir) {
+                        t.materia = "MATÉRIA APAGADA";
+                    }
+                });
+                localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
 
-            desligarLixeira();
-            carregarTudo();
-            sincronizarComNuvem(); // Sincroniza a exclusão
-        }
-    });
+                desligarLixeira();
+                carregarTudo();
+                sincronizarComNuvem();
+            }
+        });
+    }
 
     function desligarLixeira() {
-        modoExclusao = false;
+        window.modoExclusaoGlobal = false;
         materiaParaExcluir = null;
-        btnLixeira.style.transform = "scale(1)";
-        btnLixeira.style.filter = "none";
+        if (btnLixeira) {
+            btnLixeira.style.transform = "scale(1)";
+            btnLixeira.style.filter = "none";
+        }
         document.querySelectorAll('.materia-item').forEach(m => m.classList.remove('selecionada-para-excluir'));
     }
 
-    // Inicializa a tela!
-    atualizarCalendario();
+    if (document.getElementById('mesAnoDisplay')) {
+        atualizarCalendario();
+    } else {
+        carregarTudo();
+    }
 });
