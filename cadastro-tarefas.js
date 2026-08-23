@@ -1,5 +1,38 @@
 document.addEventListener("DOMContentLoaded", () => {
     
+    // --- 0. SUPER SINCRONIZAÇÃO COM A NUVEM ---
+    async function sincronizarComNuvem() {
+        const username = localStorage.getItem('usuarioLogado');
+        if (!username) return; 
+
+        const dadosAtuais = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const chave = localStorage.key(i);
+            if (chave !== 'usuarioLogado' && chave !== 'catPlanDados') {
+                try {
+                    dadosAtuais[chave] = JSON.parse(localStorage.getItem(chave));
+                } catch(e) {
+                    dadosAtuais[chave] = localStorage.getItem(chave);
+                }
+            }
+        }
+
+        try {
+            await fetch('https://cat-plan.onrender.com/api/dados', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    username: username, 
+                    dados_do_site: dadosAtuais 
+                })
+            });
+            console.log("Miau! Cadastro de tarefas sincronizado com sucesso!");
+        } catch (error) {
+            console.error("Erro ao sincronizar com a nuvem:", error);
+        }
+    }
+
+
     const bolasPrioridade = document.querySelectorAll('.bola-prioridade');
     let prioridadeSelecionada = 'verde'; 
     const containerLista = document.getElementById('containerListaTarefas');
@@ -50,6 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         salvarNoLocalStorage(novoPasso);
         carregarTarefasNaTela();
+        sincronizarComNuvem(); // Sincroniza a criação de um novo passo
         
         inputDesc.value = "";
         inputData.value = "";
@@ -124,8 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </label>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span class="data-passo">${passo.data !== "00/00/0000" ? passo.data : ""}</span>
-                            <!-- Lápis chama a nova função editarPasso -->
-                            <img src="icone-editar.png" style="width: 15px; cursor: pointer; opacity: 0.6;" onclick="editarPasso(${passo.id})" title="Editar este passo e data" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
+                            <img src="icone-editar.png" style="width: 15px; cursor: pointer; opacity: 0.6;" onclick="editarPasso(${passo.id})" title="Editar este passo, data e cor" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
                         </div>
                     </div>
                 `;
@@ -143,6 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     todas = todas.filter(t => `${t.materia}___${t.tituloTarefa}` !== chave);
                     localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(todas));
                     carregarTarefasNaTela();
+                    sincronizarComNuvem(); // Sincroniza a exclusão do trabalho
                 }
             });
 
@@ -158,6 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                     localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(todas));
                     carregarTarefasNaTela();
+                    sincronizarComNuvem(); // Sincroniza a edição do título
                 }
             });
 
@@ -181,33 +216,43 @@ document.addEventListener("DOMContentLoaded", () => {
             tarefas[index].concluida = true; 
             localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
             carregarTarefasNaTela(); 
+            sincronizarComNuvem(); // Sincroniza conclusão de um passo
         }
     }
 
-    // NOVA FUNÇÃO: Edita a descrição E a data do passo
+    // FUNÇÃO ATUALIZADA: Edita a descrição, data e COR da prioridade!
     window.editarPasso = function(idPasso) {
         let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
         const index = tarefas.findIndex(t => t.id === idPasso);
         if (index !== -1) {
-            // 1. Pergunta a descrição nova (ou mantém a atual)
+            
+            // 1. Edita a descrição
             const novoTexto = prompt("Edite a descrição do passo:", tarefas[index].descricao);
-            if (novoTexto === null) return; // Se clicar em "Cancelar", ele para por aqui
+            if (novoTexto === null) return; 
 
-            // 2. Pergunta a data
+            // 2. Edita a data
             let dataAtual = tarefas[index].data === "00/00/0000" ? "" : tarefas[index].data;
             const novaData = prompt("Edite a data do passo (Formato: DD/MM/AAAA) ou deixe em branco:", dataAtual);
-            if (novaData === null) return; // Se clicar em "Cancelar", ele para por aqui
+            if (novaData === null) return; 
 
-            // Salva as alterações se o texto não for vazio
-            if (novoTexto.trim() !== "") {
-                tarefas[index].descricao = novoTexto.trim();
-            }
-            
-            // Grava a data formatada
+            // 3. Edita a cor!
+            const novaCor = prompt("Qual a prioridade deste passo? (Digite verde, laranja ou vermelha)", tarefas[index].prioridade || 'verde');
+            if (novaCor === null) return;
+            const corLimpa = novaCor.trim().toLowerCase();
+
+            // Salva as alterações
+            if (novoTexto.trim() !== "") tarefas[index].descricao = novoTexto.trim();
             tarefas[index].data = novaData.trim() === "" ? "00/00/0000" : novaData.trim();
+            
+            if (['verde', 'laranja', 'vermelha'].includes(corLimpa)) {
+                tarefas[index].prioridade = corLimpa;
+            } else {
+                alert("Cor inválida. Mantendo a cor anterior!");
+            }
 
             localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
             carregarTarefasNaTela(); 
+            sincronizarComNuvem(); // Sincroniza as edições feitas no passo!
         }
     }
 });
