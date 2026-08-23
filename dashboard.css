@@ -677,12 +677,11 @@ body {
 
 /* Padroniza a bolinha de compromisso para roxo */
 input[type="checkbox"].compromisso, 
-.passo-item.prioridade-roxo, 
 .compromisso-checkbox {
-    accent-color: #9b51e0; /* Tom de roxo combinando com o tema */
+    accent-color: #9b51e0; 
 }
 
-/* Corrige o alinhamento do texto e da bolinha de compromisso na rotina */
+/* Corrige o alinhamento dos itens na lista de rotina/compromissos */
 .task-list li {
     display: flex;
     align-items: center;
@@ -690,7 +689,7 @@ input[type="checkbox"].compromisso,
     margin-bottom: 8px;
 }
 
-/* Organiza os cards de avaliações em uma grade firme e responsiva */
+/* Organiza os cards de avaliações em uma grade firme */
 .avaliacoes-grid, .container-avaliacoes, section.avaliacoes-section {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
