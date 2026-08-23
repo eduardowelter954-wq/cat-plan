@@ -170,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 listaRotina.appendChild(divisor);
             }
 
-            compromissosHoje.forEach(comp => {
+compromissosHoje.forEach(comp => {
                 const li = document.createElement('li');
                 li.style.display = 'flex';
                 li.style.alignItems = 'center';
@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 li.innerHTML = `
                     <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1; text-decoration: ${comp.concluido ? 'line-through' : 'none'}; opacity: ${comp.concluido ? '0.6' : '1'};">
-                        <input type="checkbox" class="check-passo laranja" ${comp.concluido ? 'checked' : ''} onchange="toggleCompromissoDashboard(${comp.id}, '${dataStr}')">
+                        <input type="checkbox" class="compromisso-checkbox" ${comp.concluido ? 'checked' : ''} onchange="toggleCompromissoDashboard(${comp.id}, '${dataStr}')">
                         <span><strong style="font-size: 11px; background: #ebd9fc; padding: 2px 6px; border-radius: 4px; margin-right: 5px;">COMPROMISSO</strong> ${comp.descricao}</span>
                     </label>
                 `;
