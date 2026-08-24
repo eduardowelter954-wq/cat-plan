@@ -182,7 +182,7 @@ body {
 
 /* --- SUBGUIAS AZUIS (Para Estudos/Avaliações) --- */
 .action-btn-azul {
-    background-color: #ffffff !important; /* Fundo branco por padrão */
+    background-color: #ffffff !important; /* Fundo 100% branco por padrão */
     border: 3px solid #b9d7ef !important; /* Borda azul clara */
     color: #1a365d !important; /* Texto escuro */
 }
