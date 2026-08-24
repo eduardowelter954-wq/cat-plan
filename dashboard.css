@@ -675,27 +675,61 @@ body {
     opacity: 1;
 }
 
+/* --- PADRONIZAÇÃO DAS CHECKBOXES PARA QUADRADINHAS --- */
+.task-list input[type="checkbox"],
+.checklist input[type="checkbox"],
+.passo-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 2px solid #000;
+    border-radius: 4px; /* Formato quadradinho com cantos levemente arredondados */
+    outline: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+}
+
+/* Símbolo de check nas caixinhas padrão */
+.task-list input[type="checkbox"]:checked::before,
+.passo-item input[type="checkbox"]:checked::before {
+    content: "✔";
+    font-size: 14px;
+    font-weight: bold;
+    color: #000;
+}
+
 /* Força a cor roxa na checkbox de compromissos */
 input[type="checkbox"].compromisso, 
 .compromisso-checkbox {
     accent-color: #9b51e0 !important;
+    border-color: #9b51e0 !important;
 }
 
-/* Garante que os cards de avaliação tenham largura fixa e não quebrem o layout */
+/* --- ORGANIZAÇÃO DOS CARDS DE AVALIAÇÃO --- */
 #containerAvaliacoes {
-    display: flex !important;
-    flex-wrap: wrap !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
     gap: 20px !important;
+    width: 100% !important;
 }
 
 .card-avaliacao {
-    width: 260px !important;
+    width: 100% !important;
+    max-width: 280px !important;
     min-height: 150px !important;
     background: #fff !important;
-    border: 1px solid #ddd !important;
+    border: 2px solid #dcdcdc !important;
     border-radius: 8px !important;
-    padding: 15px !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+    box-shadow: 4px 4px 0px #cfcfcf !important;
+    padding: 20px !important;
     box-sizing: border-box !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
 }
 
