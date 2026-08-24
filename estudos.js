@@ -202,18 +202,12 @@ document.addEventListener("DOMContentLoaded", () => {
             if (tarefa.data === "ESPERA") {
                 if (areaEspera) areaEspera.appendChild(divTarefa);
             } 
-            else if (tarefa.data === "00/00/0000") {
-                // Tarefa sem data fica apenas na Área de Espera e NÃO vai para o calendário semanal
+else if (tarefa.data === "00/00/0000") {
+                // Joga a tarefa original direto para a Área de Espera, sem clonar para os dias de aula
                 if (areaEspera) {
-                    const clone = divTarefa.cloneNode(true);
-                    clone.addEventListener('dragstart', (e) => {
-                        e.dataTransfer.setData('text/plain', tarefa.id);
-                        setTimeout(() => clone.style.opacity = '0.5', 0);
-                    });
-                    clone.addEventListener('dragend', () => clone.style.opacity = '1');
-                    areaEspera.appendChild(clone);
+                    areaEspera.appendChild(divTarefa);
                 }
-            } 
+            }
             else {
                 const cardDoDia = document.querySelector(`.day-card[data-data="${tarefa.data}"] .tasks-container`);
                 if (cardDoDia) {
