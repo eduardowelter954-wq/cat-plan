@@ -180,17 +180,17 @@ body {
     border-color: #d1b3ff !important;
 }
 
-/* --- SUBGUIAS AZUIS (Azul bem fraquinho exclusivo para Estudos/Avaliações) --- */
+/* --- SUBGUIAS AZUIS (Para Estudos/Avaliações) --- */
 .action-btn-azul {
-    background-color: #f4f9ff !important; /* Fundo azul quase branco super suave */
-    border: 3px solid #b9d7ef !important; /* Borda azul pastel */
-    color: #1a365d !important;
+    background-color: #ffffff !important; /* Fundo branco por padrão */
+    border: 3px solid #b9d7ef !important; /* Borda azul clara */
+    color: #1a365d !important; /* Texto escuro */
 }
 
 .action-btn-azul.active-page,
 .action-btn-azul:hover {
-    background-color: #dbeaff !important;
-    border-color: #7eaedb !important;
+    background-color: #cce0ff !important; /* Azul mais fortinho (mesmo da guia lateral) */
+    border-color: #7eaedb !important; /* Borda um pouco mais escura para destacar */
 }
 
 /* Tamanho dos ícones em imagem */
