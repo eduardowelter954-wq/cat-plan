@@ -202,12 +202,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (tarefa.data === "ESPERA") {
                 if (areaEspera) areaEspera.appendChild(divTarefa);
             } 
-else if (tarefa.data === "00/00/0000") {
-                // Joga a tarefa original direto para a Área de Espera, sem clonar para os dias de aula
-                if (areaEspera) {
-                    areaEspera.appendChild(divTarefa);
-                }
-            }
+
+            else if (tarefa.data === "00/00/0000") {
+                // Não faz nada! A tarefa fica invisível no calendário e não vai mais para a área azul.
+            } 
             else {
                 const cardDoDia = document.querySelector(`.day-card[data-data="${tarefa.data}"] .tasks-container`);
                 if (cardDoDia) {
