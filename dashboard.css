@@ -161,14 +161,23 @@ body {
     gap: 15px;
 }
 
+/* MODIFICADO: Subguias agora com o tema Azul */
 .action-btn {
     padding: 12px 20px;
-    background-color: #fff;
-    border: 3px solid #ebd9fc; /* Cor roxinha do seu design */
+    background-color: #cce0ff !important; /* Azul claro do tema */
+    border: 3px solid #7eaedb !important; /* Borda azul */
+    color: #1a365d !important; /* Texto escuro para contraste */
     border-radius: 12px;
     font-weight: 800;
     font-size: 14px;
     cursor: pointer;
+    transition: 0.2s;
+}
+
+.action-btn.active-page,
+.action-btn:hover {
+    background-color: #b9d7ef !important;
+    border-color: #4a90e2 !important;
 }
 
 .mascot-reading {
@@ -341,9 +350,10 @@ body {
     gap: 15px;
 }
 
+/* MODIFICADO: Fundo do card dos dias da semana em Azul Suave */
 .day-card {
-    background: #fff;
-    border: 2px solid #dcdcdc;
+    background-color: #f0f7ff !important; /* Azul bem clarinho no fundo do dia */
+    border: 2px solid #b0d0ff !important; /* Borda azulada suave */
     border-radius: 10px;
     box-shadow: 4px 4px 0px #cfcfcf;
     padding: 10px;
@@ -732,4 +742,3 @@ input[type="checkbox"].compromisso,
     flex-direction: column !important;
     gap: 12px !important;
 }
-
