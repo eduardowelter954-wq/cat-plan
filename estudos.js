@@ -199,11 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             divTarefa.addEventListener('dragend', () => divTarefa.style.opacity = '1');
 
-            if (tarefa.data === "ESPERA") {
-                if (areaEspera) areaEspera.appendChild(divTarefa);
-            } 
-
-            else if (tarefa.data === "00/00/0000") {
+            if (tarefa.data === "ESPERA" || tarefa.data === "00/00/0000") {
                 // Não faz nada! A tarefa fica invisível no calendário e não vai mais para a área azul.
             } 
             else {
