@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (areaEspera) areaEspera.appendChild(divTarefa);
             } 
             else if (tarefa.data === "00/00/0000") {
-                // Tarefas sem data vão direto para a área de espera e não poluem o calendário
+                // Tarefa sem data fica apenas na Área de Espera e NÃO vai para o calendário semanal
                 if (areaEspera) {
                     const clone = divTarefa.cloneNode(true);
                     clone.addEventListener('dragstart', (e) => {
