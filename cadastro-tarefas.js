@@ -64,7 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        if (!data) {
+if (!data) {
+            // Se não colocar data, mantém como "00/00/0000" para NÃO puxar automaticamente para o calendário!
             data = "00/00/0000";
         } else {
             const partes = data.split('-');
