@@ -143,7 +143,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Função de edição segura (permite mudar nome, professor e dias, incluindo sábados e domingos)
     function editarMateria(nomeMateria) {
         let materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
         const index = materias.findIndex(m => m.nome === nomeMateria);
@@ -180,7 +179,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
-        const materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
 
         tarefas.forEach(tarefa => {
             if (tarefa.concluida) return; 
@@ -205,21 +203,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (areaEspera) areaEspera.appendChild(divTarefa);
             } 
             else if (tarefa.data === "00/00/0000") {
-                const matVinculada = materias.find(m => m.nome === tarefa.materia);
-                if (matVinculada && matVinculada.dias) {
-                    const diasAula = matVinculada.dias.toLowerCase();
-                    diasDaSemanaNome.forEach(diaSemana => {
-                        if (diasAula.includes(diaSemana.toLowerCase())) {
-                            const container = document.querySelector(`#dia-${diaSemana} .tasks-container`);
-                            const clone = divTarefa.cloneNode(true);
-                            clone.addEventListener('dragstart', (e) => {
-                                e.dataTransfer.setData('text/plain', tarefa.id);
-                                setTimeout(() => clone.style.opacity = '0.5', 0);
-                            });
-                            clone.addEventListener('dragend', () => clone.style.opacity = '1');
-                            if(container) container.appendChild(clone);
-                        }
+                // Tarefas sem data vão direto para a área de espera e não poluem o calendário
+                if (areaEspera) {
+                    const clone = divTarefa.cloneNode(true);
+                    clone.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', tarefa.id);
+                        setTimeout(() => clone.style.opacity = '0.5', 0);
                     });
+                    clone.addEventListener('dragend', () => clone.style.opacity = '1');
+                    areaEspera.appendChild(clone);
                 }
             } 
             else {
