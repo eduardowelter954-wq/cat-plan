@@ -15,13 +15,18 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
         const data = await response.json();
 
-        if (response.ok) {
+if (response.ok) {
             // 1. Salva o nome do usuário logado
             localStorage.setItem('usuarioLogado', username);
 
-            // 2. Se a conta já possui dados salvos no Supabase, atualiza o navegador
+            // 2. Se a conta possui dados salvos no servidor, desempacota e injeta no localStorage
             if (data.dados) {
-                localStorage.setItem('catPlanDados', JSON.stringify(data.dados));
+                // Se os dados vierem em um objeto agrupado, desmembra chave por chave
+                const dadosParaSalvar = typeof data.dados === 'string' ? JSON.parse(data.dados) : data.dados;
+                
+                for (const [chave, valor] of Object.entries(dadosParaSalvar)) {
+                    localStorage.setItem(chave, typeof valor === 'string' ? valor : JSON.stringify(valor));
+                }
             }
 
             alert("Miau! Bem-vindo ao Cat-Plan!");
