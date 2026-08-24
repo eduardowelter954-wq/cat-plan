@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function carregarRotinasECompromissos(dataStr) {
         listaRotina.innerHTML = "";
         
-        // A. Carrega Rotinas se o filtro estiver marcado
+        // A. Carrega Rotinas se o filtro estiver marcado (AGORA COM CHECKBOX QUADRADINHA PADRÃO)
         if (filtroRotina && filtroRotina.checked) {
             let rotinas = JSON.parse(localStorage.getItem('catPlanRotinasGlobal')) || [];
             let checksPorDia = JSON.parse(localStorage.getItem('catPlanRotinasChecks')) || {};
@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 li.innerHTML = `
                     <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1; text-decoration: ${isChecked ? 'line-through' : 'none'}; opacity: ${isChecked ? '0.6' : '1'};">
-                        <input type="checkbox" class="check-passo verde" ${isChecked ? 'checked' : ''} onchange="toggleRotina(${rotina.id}, '${dataStr}')">
+                        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleRotina(${rotina.id}, '${dataStr}')">
                         <span>${rotina.texto}</span>
                     </label>
                     ${modoEdicaoRotina ? `<img src="icone-lixeira.png" style="width: 16px; cursor: pointer;" onclick="excluirRotina(${rotina.id})">` : ''}
@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // B. Carrega Compromissos se o filtro estiver marcado
+        // B. Carrega Compromissos se o filtro estiver marcado (COM A CAIXINHA ROXA)
         if (filtroCompromisso && filtroCompromisso.checked) {
             const partes = dataStr.split('/');
             const dataCompFormat = `${partes[2]}-${partes[1]}-${partes[0]}`; 
@@ -170,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 listaRotina.appendChild(divisor);
             }
 
-compromissosHoje.forEach(comp => {
+            compromissosHoje.forEach(comp => {
                 const li = document.createElement('li');
                 li.style.display = 'flex';
                 li.style.alignItems = 'center';
@@ -255,9 +255,10 @@ compromissosHoje.forEach(comp => {
             li.style.alignItems = 'center';
             li.style.marginBottom = '8px';
 
+            // AGORA TAMBÉM COM CHECKBOX QUADRADINHA PADRÃO NAS TAREFAS DIÁRIAS
             li.innerHTML = `
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1; text-decoration: ${tarefa.concluida ? 'line-through' : 'none'}; opacity: ${tarefa.concluida ? '0.6' : '1'};">
-                    <input type="checkbox" class="check-passo verde" ${tarefa.concluida ? 'checked' : ''} onchange="toggleTarefa(${tarefa.id}, '${dataStr}')">
+                    <input type="checkbox" ${tarefa.concluida ? 'checked' : ''} onchange="toggleTarefa(${tarefa.id}, '${dataStr}')">
                     <span>${tarefa.texto}</span>
                 </label>
                 <img src="icone-lixeira.png" style="width: 16px; cursor: pointer; margin-left: 10px; opacity: 0.5;" onclick="excluirTarefa(${tarefa.id}, '${dataStr}')" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">
