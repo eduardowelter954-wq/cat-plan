@@ -199,8 +199,14 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             divTarefa.addEventListener('dragend', () => divTarefa.style.opacity = '1');
 
-            if (tarefa.data === "ESPERA" || tarefa.data === "00/00/0000") {
-                // Não faz nada! A tarefa fica invisível no calendário e não vai mais para a área azul.
+           if (tarefa.data === "ESPERA") {
+                // VOLTOU! Se você arrastar para a fita azul, ela fica aqui esperando para ir para outra semana.
+                if (areaEspera) {
+                    areaEspera.appendChild(divTarefa);
+                }
+            } 
+            else if (tarefa.data === "00/00/0000") {
+                // Não faz nada! Apenas as tarefas recém-criadas sem data ficam invisíveis no calendário.
             } 
             else {
                 const cardDoDia = document.querySelector(`.day-card[data-data="${tarefa.data}"] .tasks-container`);
