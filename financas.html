@@ -21,13 +21,9 @@
         <!-- COLUNA 2 E 3: Área Central (Meses e Legenda) -->
         <section class="financas-centro">
             
-            <!-- Coluna dos Meses -->
+            <!-- Coluna dos Meses (O JS vai preencher isso sozinho agora!) -->
             <div class="coluna-meses" id="listaMesesFinancas">
-                <!-- Exemplo estático inicial (Depois o JS vai gerar isso automaticamente) -->
-                <div class="bubble-card bubble-vermelho">Agosto 2026</div>
-                <div class="bubble-card bubble-laranja">Julho 2026</div>
-                <div class="bubble-card bubble-verde">Junho 2026</div>
-                <div class="bubble-card bubble-laranja">Setembro 2026</div>
+                <!-- Os meses vão aparecer aqui -->
             </div>
 
             <!-- Coluna da Legenda e Edição de Porcentagens -->
@@ -35,18 +31,18 @@
                 <h4 style="font-size: 16px; margin-bottom: 5px;">Quantidade de gastos no mês:</h4>
                 
                 <div class="legenda-item">
-                    <div class="bubble-card bubble-vermelho" style="flex-grow: 1;">Acima de 80%</div>
-                    <img src="icone-editar.png" alt="Editar" class="icon-edit" style="position: relative; width: 20px;">
+                    <div class="bubble-card bubble-vermelho" style="flex-grow: 1;" id="legendaVermelha">Acima de 80%</div>
+                    <img src="icone-editar.png" alt="Editar" class="icon-edit" id="btnEditVermelho" style="position: relative; width: 20px; cursor: pointer;" title="Editar limite vermelho">
                 </div>
                 
                 <div class="legenda-item">
-                    <div class="bubble-card bubble-laranja" style="flex-grow: 1;">de 61% a 79%</div>
-                    <img src="icone-editar.png" alt="Editar" class="icon-edit" style="position: relative; width: 20px;">
+                    <div class="bubble-card bubble-laranja" style="flex-grow: 1;" id="legendaLaranja">de 61% a 79%</div>
+                    <!-- Laranja é automático, não precisa de botão de editar -->
                 </div>
                 
                 <div class="legenda-item">
-                    <div class="bubble-card bubble-verde" style="flex-grow: 1;">de 0% a 60%</div>
-                    <img src="icone-editar.png" alt="Editar" class="icon-edit" style="position: relative; width: 20px;">
+                    <div class="bubble-card bubble-verde" style="flex-grow: 1;" id="legendaVerde">de 0% a 60%</div>
+                    <img src="icone-editar.png" alt="Editar" class="icon-edit" id="btnEditVerde" style="position: relative; width: 20px; cursor: pointer;" title="Editar limite verde">
                 </div>
             </div>
             
@@ -67,6 +63,7 @@
 
     </div>
 
-    <!-- <script src="financas.js"></script> -->
+    <!-- Puxando o nosso novo arquivo JavaScript -->
+    <script src="financas.js"></script>
 </body>
 </html>
