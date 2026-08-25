@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat-Plan - Finanças</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container" style="max-width: 1400px;">
+        
+        <!-- COLUNA 1: Menu Lateral -->
+        <nav class="sidebar">
+            <button class="menu-btn tarefas" onclick="window.location.href='dashboard.html'">Tarefas</button>
+            <button class="menu-btn estudos" onclick="window.location.href='estudos.html'">Estudos</button>
+            <button class="menu-btn active financas" onclick="window.location.href='financas.html'">Finanças</button>
+            <button class="menu-btn organizacao">Organização</button>
+            <button class="menu-btn hobby">Hobby</button>
+        </nav>
+
+        <!-- COLUNA 2 E 3: Área Central (Meses e Legenda) -->
+        <section class="financas-centro">
+            
+            <!-- Coluna dos Meses -->
+            <div class="coluna-meses" id="listaMesesFinancas">
+                <!-- Exemplo estático inicial (Depois o JS vai gerar isso automaticamente) -->
+                <div class="bubble-card bubble-vermelho">Agosto 2026</div>
+                <div class="bubble-card bubble-laranja">Julho 2026</div>
+                <div class="bubble-card bubble-verde">Junho 2026</div>
+                <div class="bubble-card bubble-laranja">Setembro 2026</div>
+            </div>
+
+            <!-- Coluna da Legenda e Edição de Porcentagens -->
+            <div class="coluna-legenda">
+                <h4 style="font-size: 16px; margin-bottom: 5px;">Quantidade de gastos no mês:</h4>
+                
+                <div class="legenda-item">
+                    <div class="bubble-card bubble-vermelho" style="flex-grow: 1;">Acima de 80%</div>
+                    <img src="icone-editar.png" alt="Editar" class="icon-edit" style="position: relative; width: 20px;">
+                </div>
+                
+                <div class="legenda-item">
+                    <div class="bubble-card bubble-laranja" style="flex-grow: 1;">de 61% a 79%</div>
+                    <img src="icone-editar.png" alt="Editar" class="icon-edit" style="position: relative; width: 20px;">
+                </div>
+                
+                <div class="legenda-item">
+                    <div class="bubble-card bubble-verde" style="flex-grow: 1;">de 0% a 60%</div>
+                    <img src="icone-editar.png" alt="Editar" class="icon-edit" style="position: relative; width: 20px;">
+                </div>
+            </div>
+            
+        </section>
+
+        <!-- COLUNA 4: Painel Direito (Subguias de Finanças) -->
+        <aside class="right-panel" style="width: 280px;">
+            <div class="top-buttons">
+                <button class="action-btn action-btn-verde active-page">Registro</button>
+                <button class="action-btn action-btn-verde">Metas de dinheiro</button>
+                <button class="action-btn action-btn-verde">Gastos</button>
+                <button class="action-btn action-btn-verde">Contas fixas</button>
+                <button class="action-btn action-btn-verde">Cadastro de conta no banco e forma de pagamento</button>
+                <button class="action-btn action-btn-verde">Entrada e transferência de dinheiro</button>
+                <button class="action-btn action-btn-verde">Extrato bancário</button>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- <script src="financas.js"></script> -->
+</body>
+</html>
