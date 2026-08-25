@@ -764,3 +764,31 @@ input[type="checkbox"].compromisso,
     flex-direction: column !important;
     gap: 12px !important;
 }
+
+/* --- RECUPERANDO AS CORES DE PRIORIDADE NOS PASSOS --- */
+.passo-item input[type="checkbox"].verde,
+.check-passo.verde { 
+    border-color: #4caf50 !important; 
+}
+.passo-item input[type="checkbox"].laranja,
+.check-passo.laranja { 
+    border-color: #ff9800 !important; 
+}
+.passo-item input[type="checkbox"].vermelha,
+.check-passo.vermelha { 
+    border-color: #f44336 !important; 
+}
+
+/* Deixando o "check" (✔) da mesma cor da borda */
+.passo-item input[type="checkbox"].verde:checked::before,
+.check-passo.verde:checked::before { 
+    color: #4caf50 !important; 
+}
+.passo-item input[type="checkbox"].laranja:checked::before,
+.check-passo.laranja:checked::before { 
+    color: #ff9800 !important; 
+}
+.passo-item input[type="checkbox"].vermelha:checked::before,
+.check-passo.vermelha:checked::before { 
+    color: #f44336 !important; 
+}
