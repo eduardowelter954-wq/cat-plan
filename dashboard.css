@@ -886,3 +886,69 @@ input[type="checkbox"].compromisso,
     gap: 10px;
 }
 
+/* =========================================
+   TELA DE METAS DE DINHEIRO
+========================================= */
+.card-dinheiro {
+    border: 3px solid #000;
+    border-radius: 12px;
+    padding: 20px;
+    width: 320px;
+    position: relative;
+    font-weight: bold;
+}
+
+/* Poupança (Fundo branco, sombra verde clara embaixo) */
+.card-poupanca {
+    background-color: #fff;
+    box-shadow: 6px 6px 0px #e8f5e9; /* Efeito da sombra verde clarinha */
+    text-align: center;
+}
+
+/* Metas (Fundo verde, sombra preta) */
+.card-meta {
+    background-color: #b2f2bb; /* Verde do seu design */
+    box-shadow: 6px 6px 0px #000;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Brilhinhos (✦) nos cantos do cartão de Meta */
+.card-meta::before {
+    content: '✦';
+    position: absolute;
+    top: -15px;
+    right: -10px;
+    font-size: 24px;
+    color: #000;
+}
+.card-meta::after {
+    content: '✦';
+    position: absolute;
+    bottom: -15px;
+    left: -10px;
+    font-size: 24px;
+    color: #000;
+}
+
+.meta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+.meta-valores {
+    font-size: 20px;
+    font-weight: normal;
+}
+
+.meta-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    text-transform: uppercase;
+}
