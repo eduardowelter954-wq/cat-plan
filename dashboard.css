@@ -897,8 +897,8 @@ input[type="checkbox"].compromisso,
     width: 320px;
     min-height: 170px;
     
-    /* AQUI ESTÁ A MÁGICA: Aumentamos o espaço para empurrar o texto mais para o meio */
-    padding: 45px 35px 35px 35px; /* Cima, Direita, Baixo, Esquerda */
+    /* AQUI ESTÁ A MÁGICA: Cima, Direita, Baixo (bem maior), Esquerda */
+    padding: 30px 35px 50px 30px; 
     box-sizing: border-box;
     
     background-size: 100% 100%;
