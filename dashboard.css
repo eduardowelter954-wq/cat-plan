@@ -895,9 +895,8 @@ input[type="checkbox"].compromisso,
     box-shadow: none;
     
     width: 320px;
-    min-height: 170px;
+    height: 180px; /* MÁGICA 1: Altura travada! Eles nunca mais vão ter tamanhos diferentes */
     
-    /* AQUI ESTÁ A MÁGICA: Cima, Direita, Baixo (bem maior), Esquerda */
     padding: 30px 35px 50px 30px; 
     box-sizing: border-box;
     
