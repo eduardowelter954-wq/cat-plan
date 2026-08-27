@@ -897,9 +897,8 @@ input[type="checkbox"].compromisso,
     width: 320px;
     min-height: 170px;
     
-    /* O padding é o segredo! Ele empurra os textos para dentro, 
-       impedindo que fiquem em cima da borda preta desenhada da imagem */
-    padding: 25px 30px; 
+    /* AQUI ESTÁ A MÁGICA: Aumentamos o espaço para empurrar o texto mais para o meio */
+    padding: 45px 35px 35px 35px; /* Cima, Direita, Baixo, Esquerda */
     box-sizing: border-box;
     
     background-size: 100% 100%;
@@ -908,7 +907,7 @@ input[type="checkbox"].compromisso,
     
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Espalha o topo e o rodapé */
+    justify-content: space-between; 
 }
 
 .card-poupanca {
