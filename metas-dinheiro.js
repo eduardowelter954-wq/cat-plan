@@ -69,9 +69,9 @@ document.addEventListener("DOMContentLoaded", () => {
             divMeta.className = 'card-dinheiro card-meta';
             
             divMeta.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center; text-transform: uppercase;">
-                    <span style="font-size: 16px; margin-bottom: 5px;">FALTA: ${falta}</span>
-                    <img src="icone-check.png" class="check-meta-btn" data-id="${meta.id}" style="width: 22px; cursor: pointer; margin-bottom: 5px;" title="Concluir">
+<div style="display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; margin-bottom: 0;">
+                    <span style="font-size: 16px;">FALTA: ${falta}</span>
+                    <img src="icone-check.png" class="check-meta-btn" data-id="${meta.id}" style="width: 20px; cursor: pointer;" title="Concluir">
                 </div>
                 <div class="meta-valores">
                     ${meta.atual} / ${meta.meta}
