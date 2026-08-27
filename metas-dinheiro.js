@@ -68,17 +68,22 @@ document.addEventListener("DOMContentLoaded", () => {
             const divMeta = document.createElement('div');
             divMeta.className = 'card-dinheiro card-meta';
             
-            divMeta.innerHTML = `
-<div style="display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; margin-bottom: 0;">
-                    <span style="font-size: 16px;">FALTA: ${falta}</span>
-                    <img src="icone-check.png" class="check-meta-btn" data-id="${meta.id}" style="width: 20px; cursor: pointer;" title="Concluir">
+divMeta.innerHTML = `
+                <!-- TOPO: Título da meta e Botão de Editar -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <span style="font-size: 18px; font-weight: bold; text-transform: uppercase; word-break: break-word; padding-right: 10px;">${meta.titulo}</span>
+                    <img src="icone-editar.png" class="edit-meta-btn" data-id="${meta.id}" style="width: 20px; cursor: pointer; margin-top: 2px;" title="Editar Meta">
                 </div>
-                <div class="meta-valores">
+                
+                <!-- MEIO: Valores (Atual / Meta) -->
+                <div style="font-size: 22px; font-weight: normal; margin-top: 15px;">
                     ${meta.atual} / ${meta.meta}
                 </div>
-                <div class="meta-footer">
-                    <span>FALTA: ${falta}</span>
-                    <img src="icone-check.png" class="check-meta-btn" data-id="${meta.id}" style="width: 30px; cursor: pointer;" title="Concluir/Excluir">
+                
+                <!-- RODAPÉ: Falta e Botão de Concluir (Empurrado para o cantinho) -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; text-transform: uppercase; margin-top: auto;">
+                    <span style="font-size: 16px;">FALTA: ${falta}</span>
+                    <img src="icone-check.png" class="check-meta-btn" data-id="${meta.id}" style="width: 26px; cursor: pointer; margin-right: -10px; margin-bottom: -10px;" title="Concluir">
                 </div>
             `;
             containerMetas.appendChild(divMeta);
