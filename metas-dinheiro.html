@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat-Plan - Metas de Dinheiro</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container" style="max-width: 1400px;">
+        
+        <!-- Menu Lateral -->
+        <nav class="sidebar">
+            <button class="menu-btn tarefas" onclick="window.location.href='dashboard.html'">Tarefas</button>
+            <button class="menu-btn estudos" onclick="window.location.href='estudos.html'">Estudos</button>
+            <button class="menu-btn active financas" onclick="window.location.href='financas.html'">Finanças</button>
+            <button class="menu-btn organizacao">Organização</button>
+            <button class="menu-btn hobby">Hobby</button>
+        </nav>
+
+        <!-- Área Central (Poupança e Metas) -->
+        <section class="metas-layout" style="flex-grow: 1; padding: 20px; display: flex; flex-direction: column; gap: 20px;">
+            
+            <!-- Cartão da Poupança -->
+            <div class="card-dinheiro card-poupanca">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="text-transform: uppercase; font-size: 18px; margin-bottom: 10px;">POUPANÇA</h3>
+                    <img src="icone-editar.png" alt="Editar" id="btnEditarPoupanca" style="width: 20px; cursor: pointer;">
+                </div>
+                <p id="textoPoupanca" style="font-size: 20px; font-weight: normal;">0 / 0</p>
+            </div>
+
+            <!-- Botão de Adicionar Nova Meta -->
+            <div>
+                <img src="icone-adicionar.png" alt="Adicionar Meta" id="btnNovaMeta" style="width: 25px; cursor: pointer; margin-left: 10px;">
+            </div>
+
+            <!-- Container das Metas -->
+            <div id="containerMetas" style="display: flex; flex-wrap: wrap; gap: 30px;">
+                <!-- Os cartões de metas serão gerados aqui pelo JavaScript -->
+            </div>
+
+        </section>
+
+        <!-- Painel Direito (Subguias de Finanças) -->
+        <aside class="right-panel" style="width: 280px;">
+            <div class="top-buttons">
+                <button class="action-btn action-btn-verde" onclick="window.location.href='financas.html'">Registro</button>
+                <button class="action-btn action-btn-verde active-page">Metas de dinheiro</button>
+                <button class="action-btn action-btn-verde">Gastos</button>
+                <button class="action-btn action-btn-verde">Contas fixas</button>
+                <button class="action-btn action-btn-verde">Cadastro de conta no banco e forma de pagamento</button>
+                <button class="action-btn action-btn-verde">Entrada e transferência de dinheiro</button>
+                <button class="action-btn action-btn-verde">Extrato bancário</button>
+            </div>
+        </aside>
+
+    </div>
+
+    <script src="metas-dinheiro.js"></script>
+</body>
+</html>
