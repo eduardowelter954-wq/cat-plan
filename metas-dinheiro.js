@@ -70,10 +70,10 @@ document.addEventListener("DOMContentLoaded", () => {
             
 divMeta.innerHTML = `
                 <!-- TOPO: Título da meta e Botão de Editar -->
-<div style="display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; margin-top: auto;">
+<!-- RODAPÉ: Falta e Botão de Concluir (Imagem real e única) -->
+                <div style="display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; margin-top: auto;">
                     <span style="font-size: 16px;">FALTA: ${falta}</span>
-                    <!-- Removi as margens negativas e coloquei uma margem positiva para empurrar para dentro -->
-                    <img src="icone-check.png" class="check-meta-btn" data-id="${meta.id}" style="width: 24px; cursor: pointer; margin-right: 5px;" title="Concluir">
+                    <img src="icone-check.png" class="check-meta-btn" data-id="${meta.id}" style="width: 28px; cursor: pointer;" title="Concluir">
                 </div>
                 
                 <!-- MEIO: Valores (Atual / Meta) -->
