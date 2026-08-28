@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat-Plan - Gastos</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container" style="max-width: 1400px;">
+        
+        <!-- Menu Lateral -->
+        <nav class="sidebar">
+            <button class="menu-btn tarefas" onclick="window.location.href='dashboard.html'">Tarefas</button>
+            <button class="menu-btn estudos" onclick="window.location.href='estudos.html'">Estudos</button>
+            <button class="menu-btn active financas" onclick="window.location.href='financas.html'">Finanças</button>
+            <button class="menu-btn organizacao">Organização</button>
+            <button class="menu-btn hobby">Hobby</button>
+        </nav>
+
+        <!-- Área Central (Gastos) -->
+        <section style="flex-grow: 1; padding: 20px; display: flex; flex-direction: column; gap: 20px;">
+            
+            <!-- Botão de Adicionar -->
+            <div>
+                <img src="icone-adicionar.png" alt="Adicionar Gasto" id="btnNovoGasto" style="width: 25px; cursor: pointer; margin-left: 10px;" title="Registrar novo gasto">
+            </div>
+
+            <!-- Container onde os cartões vão aparecer -->
+            <div id="containerGastos" style="display: flex; flex-direction: column; gap: 25px;">
+                <!-- O JavaScript vai injetar os cartões aqui -->
+            </div>
+
+        </section>
+
+        <!-- Painel Direito (Subguias) -->
+        <aside class="right-panel" style="width: 280px;">
+            <div class="top-buttons">
+                <button class="action-btn action-btn-verde" onclick="window.location.href='financas.html'">Registro</button>
+                <button class="action-btn action-btn-verde" onclick="window.location.href='metas-dinheiro.html'">Metas de dinheiro</button>
+                <button class="action-btn action-btn-verde active-page" onclick="window.location.href='gastos.html'">Gastos</button>
+                <button class="action-btn action-btn-verde">Contas fixas</button>
+                <button class="action-btn action-btn-verde">Cadastro de conta no banco e forma de pagamento</button>
+                <button class="action-btn action-btn-verde">Entrada e transferência de dinheiro</button>
+                <button class="action-btn action-btn-verde">Extrato bancário</button>
+            </div>
+        </aside>
+
+    </div>
+
+    <script src="gastos.js"></script>
+</body>
+</html>
