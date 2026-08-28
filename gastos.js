@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (btnNovoGasto) {
         btnNovoGasto.addEventListener('click', () => {
-            const titulo = prompt("O que você comprou? (Ex: Queijo, Lanche no suporte técnico, Mod de Euro Truck)");
+            const titulo = prompt("O que você comprou? (Ex: Queijo, Lanche no trabalho, Chocolate)");
             if (!titulo) return;
 
             const valor = prompt(`Qual foi o valor gasto com '${titulo}'? (Ex: 15.50)`);
