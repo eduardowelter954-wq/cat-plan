@@ -918,3 +918,38 @@ input[type="checkbox"].compromisso,
 .card-meta {
     background-image: url('fundo-meta.png');
 }
+
+/* =========================================
+   TELA DE GASTOS
+========================================= */
+.card-gasto {
+    background-color: #fff;
+    border-radius: 12px;
+    width: 380px;
+    padding: 25px;
+    box-sizing: border-box;
+    /* Sombra cinza esfumaçada para destacar do fundo branco */
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15); 
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: relative;
+    font-weight: bold;
+    color: #000;
+}
+
+.gasto-titulo {
+    text-align: center;
+    font-size: 18px;
+    text-transform: capitalize;
+    margin-bottom: 5px;
+}
+
+.gasto-linha {
+    font-size: 16px;
+}
+
+/* O texto que o usuário preenche fica com peso normal para contrastar com os títulos */
+.gasto-linha span {
+    font-weight: normal;
+}
