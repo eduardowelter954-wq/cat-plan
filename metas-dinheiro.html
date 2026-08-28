@@ -21,14 +21,20 @@
         <!-- Área Central (Poupança e Metas) -->
         <section class="metas-layout" style="flex-grow: 1; padding: 20px; display: flex; flex-direction: column; gap: 20px;">
             
-            <!-- Cartão da Poupança -->
-            <div class="card-dinheiro card-poupanca">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3 style="text-transform: uppercase; font-size: 18px; margin: 0;">POUPANÇA</h3>
-                    <img src="icone-editar.png" alt="Editar" id="btnEditarPoupanca" style="width: 20px; cursor: pointer;">
+<!-- Cartão da Poupança usando PNG Limpo -->
+            <div class="card-dinheiro card-poupanca" style="position: relative;">
+                
+                <!-- O lápis flutuando livremente no canto direito -->
+                <img src="icone-editar.png" alt="Editar" id="btnEditarPoupanca" style="position: absolute; top: 25px; right: 30px; width: 20px; cursor: pointer;">
+                
+                <!-- O título isolado e 100% centralizado -->
+                <div style="width: 100%; text-align: center;">
+                    <span style="font-size: 18px; font-weight: bold; text-transform: uppercase;">POUPANÇA</span>
                 </div>
-                <!-- Tiramos o margin-top exagerado e colocamos o margin-bottom em 0 -->
-                <p id="textoPoupanca" style="font-size: 22px; font-weight: normal; margin-top: 10px; margin-bottom: 0; text-align: left;">1000 / 0</p>
+                
+                <!-- Os números também 100% centralizados -->
+                <p id="textoPoupanca" style="font-size: 22px; font-weight: normal; margin-top: auto; margin-bottom: auto; width: 100%; text-align: center;">0 / 0</p>
+                
             </div>
 
             <!-- Botão de Adicionar Nova Meta -->
