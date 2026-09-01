@@ -57,7 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 nome: nomeFinal
             };
 
-            contas.push(novaConta);
+            // unshift() adiciona no INÍCIO da lista (de cima para baixo)
+            contas.unshift(novaConta);
             
             inputBanco.value = '';
             chkBanco.checked = false;
@@ -77,12 +78,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const li = document.createElement('li');
             li.style.display = "flex";
             li.style.alignItems = "center";
-            li.style.justifyContent = "space-between";
-            li.style.marginBottom = "10px";
+            li.style.gap = "15px"; // Espaço bonitinho entre o lixo e o texto
+            li.style.marginBottom = "12px";
             
             li.innerHTML = `
-                <span>${conta.nome}</span>
+                <!-- Lixo colocado ANTES do texto para ficar à esquerda -->
                 <img src="lixo.png" class="btn-excluir-conta" data-id="${conta.id}" title="Excluir" style="width: 20px; cursor: pointer;">
+                <span>${conta.nome}</span>
             `;
             listaCadastrados.appendChild(li);
         });
