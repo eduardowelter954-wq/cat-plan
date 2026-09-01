@@ -1028,3 +1028,83 @@ input[type="checkbox"].compromisso,
 .btn-pagar-mes:hover {
     background-color: #81c784;
 }
+
+/* =========================================
+   TELA DE CADASTRO DE CONTAS / DINHEIRO
+========================================= */
+
+.card-cadastro {
+    background-color: #fff;
+    border-radius: 12px;
+    width: 320px;
+    padding: 30px;
+    box-sizing: border-box;
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15); 
+    position: relative;
+    font-weight: bold;
+    color: #000;
+}
+
+.linha-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    font-weight: normal;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.custom-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.input-linha {
+    border: none;
+    border-bottom: 2px solid #000;
+    background: transparent;
+    font-size: 18px;
+    width: 90%;
+    outline: none;
+    font-weight: normal;
+    padding-bottom: 5px;
+}
+
+.input-linha:disabled {
+    border-bottom: 2px solid #ccc;
+    background-color: #f9f9f9;
+}
+
+/* O Cartão Verde expansível */
+.card-cadastrados {
+    background-color: #b2f2bb; /* Verde padrão Cat-Plan */
+    border: 3px solid #000;
+    border-radius: 20px;
+    width: 400px;
+    min-height: 250px;
+    padding: 30px;
+    box-sizing: border-box;
+    /* Imita a sombra dura do seu desenho */
+    box-shadow: 8px 8px 0px #000; 
+    position: relative;
+    font-weight: bold;
+}
+
+.lista-contas {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.lista-contas li {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    font-weight: normal;
+    gap: 15px;
+}
