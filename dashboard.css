@@ -953,3 +953,78 @@ input[type="checkbox"].compromisso,
 .gasto-linha span {
     font-weight: normal;
 }
+
+/* =========================================
+   TELA DE CONTAS FIXAS
+========================================= */
+.card-conta {
+    background-color: #fff;
+    border-radius: 12px;
+    width: 380px;
+    padding: 25px;
+    box-sizing: border-box;
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15); 
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    font-weight: bold;
+    color: #000;
+}
+
+.conta-titulo {
+    font-size: 18px;
+    text-transform: capitalize;
+    margin-bottom: 5px;
+    width: 80%; /* Evita que o texto atropele os botões do canto */
+}
+
+.conta-linha {
+    font-size: 16px;
+}
+
+.conta-linha span {
+    font-weight: normal;
+}
+
+/* Bolinhas de Status */
+.status-circle {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    cursor: pointer;
+    box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+}
+
+.status-verde { background-color: #4caf50; }
+.status-vermelho { background-color: #f44336; }
+
+/* Lápis de edição abaixo da bolinha */
+.edit-conta-btn {
+    position: absolute;
+    top: 65px;
+    right: 25px;
+    width: 20px;
+    cursor: pointer;
+}
+
+/* Botão de Pagar Mês */
+.btn-pagar-mes {
+    background-color: #b2f2bb;
+    border: 2px solid #000;
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 5px;
+    align-self: flex-start;
+}
+
+.btn-pagar-mes:hover {
+    background-color: #81c784;
+}
