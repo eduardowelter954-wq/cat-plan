@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat-Plan - Cadastro de Contas</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container" style="max-width: 1400px;">
+        
+        <!-- Menu Lateral -->
+        <nav class="sidebar">
+            <button class="menu-btn tarefas" onclick="window.location.href='dashboard.html'">Tarefas</button>
+            <button class="menu-btn estudos" onclick="window.location.href='estudos.html'">Estudos</button>
+            <button class="menu-btn active financas" onclick="window.location.href='financas.html'">Finanças</button>
+            <button class="menu-btn organizacao">Organização</button>
+            <button class="menu-btn hobby">Hobby</button>
+        </nav>
+
+        <!-- Área Central (Dividida em 2 colunas) -->
+        <section style="flex-grow: 1; padding: 20px; display: flex; gap: 40px; align-items: flex-start;">
+            
+            <!-- COLUNA ESQUERDA: Formulário Novo Cadastro -->
+            <div class="card-cadastro">
+                <h3 style="text-align: center; font-size: 20px; margin-bottom: 25px;">Novo cadastro:</h3>
+                
+                <div class="linha-checkbox">
+                    <input type="checkbox" id="chkBanco" class="custom-checkbox">
+                    <label for="chkBanco">Conta no banco</label>
+                </div>
+                
+                <div class="linha-checkbox">
+                    <input type="checkbox" id="chkFisico" class="custom-checkbox">
+                    <label for="chkFisico">Dinheiro físico</label>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: normal;">Nome do banco:</label>
+                    <input type="text" id="inputBanco" class="input-linha" placeholder="Ex: Nubank, Sicredi">
+                </div>
+
+                <!-- Botão de Salvar no cantinho -->
+                <img src="icone-check.png" id="btnSalvarConta" style="position: absolute; bottom: 20px; right: 20px; width: 30px; cursor: pointer;" title="Salvar cadastro">
+            </div>
+
+            <!-- COLUNA DIREITA: Lista de Cadastrados -->
+            <div class="card-cadastrados">
+                <h3 style="text-align: center; font-size: 22px; margin-bottom: 20px;">Cadastrado:</h3>
+                <ul id="listaCadastrados" class="lista-contas">
+                    <!-- O JavaScript vai injetar as contas e as lixeiras aqui -->
+                </ul>
+            </div>
+
+        </section>
+
+        <!-- Painel Direito (Subguias) -->
+        <aside class="right-panel" style="width: 280px;">
+            <div class="top-buttons">
+                <button class="action-btn action-btn-verde" onclick="window.location.href='financas.html'">Registro</button>
+                <button class="action-btn action-btn-verde" onclick="window.location.href='metas-dinheiro.html'">Metas de dinheiro</button>
+                <button class="action-btn action-btn-verde" onclick="window.location.href='gastos.html'">Gastos</button>
+                <button class="action-btn action-btn-verde" onclick="window.location.href='contas-fixas.html'">Contas fixas</button>
+                <button class="action-btn action-btn-verde active-page" onclick="window.location.href='contas-banco.html'">Cadastro de conta no banco e forma de pagamento</button>
+                <button class="action-btn action-btn-verde">Entrada e transferência de dinheiro</button>
+                <button class="action-btn action-btn-verde">Extrato bancário</button>
+            </div>
+        </aside>
+
+    </div>
+
+    <script src="contas-banco.js"></script>
+</body>
+</html>
