@@ -90,92 +90,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // --- LÓGICA DE MATÉRIAS ---
-    const btnAddMateria = document.getElementById('btnAdicionarMateria');
-    const listaMaterias = document.getElementById('listaMaterias');
-
-    if (btnAddMateria) {
-        btnAddMateria.addEventListener('click', () => {
-            const nome = prompt("Nome da Matéria (Ex: MATEMÁTICA):");
-            if (!nome || nome.trim() === "") return;
-            
-            const professor = prompt("Nome do(a) Professor(a):") || "";
-            const dias = prompt("Dias da aula (Ex: Segunda, Quarta, Sábado, Domingo ou 'Nenhum'):") || "Nenhum";
-
-            const novaMateria = {
-                id: Date.now(),
-                nome: nome.trim().toUpperCase(),
-                professor: professor.trim(),
-                dias: dias.trim()
-            };
-
-            const materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
-            materias.push(novaMateria);
-            localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
-            carregarTudo();
-            sincronizarComNuvem();
-        });
-    }
-
-    function desenharMaterias() {
-        if (!listaMaterias) return;
-        listaMaterias.innerHTML = "";
-        const materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
-        
-        materias.forEach(mat => {
-            const matDiv = document.createElement('div');
-            matDiv.className = 'materia-item';
-            matDiv.setAttribute('data-nome', mat.nome);
-            matDiv.innerHTML = `
-                <div class="materia-info">
-                    <strong>${mat.nome} - ${mat.professor || 'Sem Prof.'}</strong>
-                    <br><span style="font-size: 12px;">Dias: ${mat.dias || 'Não definido'}</span>
-                </div>
-            `;
-            matDiv.addEventListener('click', (e) => {
-                if (window.modoExclusaoGlobal) {
-                    selecionarMateriaParaExcluir(e, mat.nome);
-                } else {
-                    editarMateria(mat.nome);
-                }
-            });
-            listaMaterias.appendChild(matDiv);
-        });
-    }
-
-    function editarMateria(nomeMateria) {
-        let materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
-        const index = materias.findIndex(m => m.nome === nomeMateria);
-        
-        if (index !== -1) {
-            const novoNome = prompt(`Editar nome da matéria:`, materias[index].nome);
-            if (novoNome === null) return;
-            
-            const novoProf = prompt(`Editar professor(a):`, materias[index].professor || '');
-            if (novoProf === null) return;
-
-            const novoDias = prompt(`Editar dias (Ex: Segunda, Sábado, Domingo ou 'Nenhum'):`, materias[index].dias || '');
-            if (novoDias === null) return;
-
-            materias[index].nome = novoNome.trim().toUpperCase() || materias[index].nome;
-            materias[index].professor = novoProf.trim();
-            materias[index].dias = novoDias.trim();
-
-            localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
-            carregarTudo();
-            sincronizarComNuvem();
-        }
-    }
-
-
-    // --- LÓGICA DE TAREFAS E DRAG & DROP ---
+    // --- LÓGICA DE TAREFAS, DRAG & DROP E PESQUISA ---
     function carregarTudo() {
-        desenharMaterias();
-        
         document.querySelectorAll('.tasks-container').forEach(c => c.innerHTML = "");
         const areaEspera = document.getElementById('areaEspera');
+        
         if (areaEspera) {
-            areaEspera.innerHTML = `<p style="color: #fff; opacity: 0.7; text-align: center; margin-top: 15px; width: 100%;">Solte tarefas aqui para levar para outra semana</p>`;
+            areaEspera.innerHTML = `<p style="color: #333; font-weight: bold; text-align: center; margin-bottom: 10px; width: 100%;">Tarefas Sem Data</p>`;
         }
 
         const tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
@@ -187,6 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
             divTarefa.className = 'tarefa-arrastavel';
             divTarefa.draggable = true;
             divTarefa.id = `tarefa-${tarefa.id}`;
+            // Guarda a descrição para o filtro de pesquisa funcionar
+            divTarefa.setAttribute('data-desc', tarefa.descricao.toLowerCase());
+            
             if(tarefa.prioridade === 'verde') divTarefa.style.backgroundColor = '#d4edda';
             if(tarefa.prioridade === 'laranja') divTarefa.style.backgroundColor = '#ffeeba';
             if(tarefa.prioridade === 'vermelha') divTarefa.style.backgroundColor = '#f8d7da';
@@ -199,14 +123,11 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             divTarefa.addEventListener('dragend', () => divTarefa.style.opacity = '1');
 
-           if (tarefa.data === "ESPERA") {
-                // VOLTOU! Se você arrastar para a fita azul, ela fica aqui esperando para ir para outra semana.
+            // Joga para o painel lateral as tarefas sem data ou em "ESPERA"
+            if (tarefa.data === "ESPERA" || tarefa.data === "00/00/0000") {
                 if (areaEspera) {
                     areaEspera.appendChild(divTarefa);
                 }
-            } 
-            else if (tarefa.data === "00/00/0000") {
-                // Não faz nada! Apenas as tarefas recém-criadas sem data ficam invisíveis no calendário.
             } 
             else {
                 const cardDoDia = document.querySelector(`.day-card[data-data="${tarefa.data}"] .tasks-container`);
@@ -215,6 +136,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         });
+        
+        filtrarTarefasSemData(); // Refaz o filtro caso algo já esteja digitado
     }
 
     const zonasDeSoltura = [document.getElementById('areaEspera'), ...document.querySelectorAll('.day-card')];
@@ -240,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             if (index !== -1) {
                 if (zona.id === 'areaEspera') {
-                    tarefas[index].data = "ESPERA";
+                    tarefas[index].data = "00/00/0000"; // Define sem data
                 } else {
                     const novaData = zona.getAttribute('data-data');
                     if (novaData) tarefas[index].data = novaData;
@@ -252,6 +175,30 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
+
+    // --- BARRA DE PESQUISA ---
+    const inputPesquisa = document.getElementById('inputPesquisaTarefas');
+    if (inputPesquisa) {
+        inputPesquisa.addEventListener('input', filtrarTarefasSemData);
+    }
+
+    function filtrarTarefasSemData() {
+        if (!inputPesquisa) return;
+        const termo = inputPesquisa.value.toLowerCase();
+        const areaEspera = document.getElementById('areaEspera');
+        
+        if (areaEspera) {
+            const tarefasListadas = areaEspera.querySelectorAll('.tarefa-arrastavel');
+            tarefasListadas.forEach(el => {
+                const desc = el.getAttribute('data-desc');
+                if (desc.includes(termo)) {
+                    el.style.display = 'block';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+        }
+    }
 
 
     // --- LIXEIRA ---
@@ -272,35 +219,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function selecionarMateriaParaExcluir(e, nomeMateria) {
-        if (!window.modoExclusaoGlobal) return;
-        document.querySelectorAll('.materia-item').forEach(m => m.classList.remove('selecionada-para-excluir'));
-        e.currentTarget.classList.add('selecionada-para-excluir');
-        materiaParaExcluir = nomeMateria;
-    }
-
-    if (btnConfirmar) {
-        btnConfirmar.addEventListener('click', () => {
-            if (window.modoExclusaoGlobal && materiaParaExcluir) {
-                let materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
-                materias = materias.filter(m => m.nome !== materiaParaExcluir);
-                localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
-
-                let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
-                tarefas.forEach(t => {
-                    if (t.materia === materiaParaExcluir) {
-                        t.materia = "MATÉRIA APAGADA";
-                    }
-                });
-                localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
-
-                desligarLixeira();
-                carregarTudo();
-                sincronizarComNuvem();
-            }
-        });
-    }
-
     function desligarLixeira() {
         window.modoExclusaoGlobal = false;
         materiaParaExcluir = null;
@@ -308,7 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
             btnLixeira.style.transform = "scale(1)";
             btnLixeira.style.filter = "none";
         }
-        document.querySelectorAll('.materia-item').forEach(m => m.classList.remove('selecionada-para-excluir'));
     }
 
     if (document.getElementById('mesAnoDisplay')) {
