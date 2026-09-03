@@ -21,10 +21,10 @@
         <!-- COLUNA 2 e 3: Área de Lista (Esquerda) e Cadastro/Matérias (Direita) -->
         <section class="cadastro-layout" style="display: flex; gap: 40px; flex-grow: 1; padding: 20px; align-items: flex-start;">
             
-            <!-- Lista de Tarefas agora na Esquerda -->
+            <!-- Lista de Tarefas (Esquerda) -->
             <div class="area-lista-tarefas" id="containerListaTarefas" style="flex: 1.2; display: flex; flex-direction: column; gap: 15px; min-width: 400px;"></div>
             
-            <!-- Formulário e Matérias na Direita -->
+            <!-- Formulário e Matérias (Direita) -->
             <div class="area-direita" style="flex: 1; display: flex; flex-direction: column; gap: 40px; min-width: 400px;">
                 
                 <!-- Formulário de Cadastro Único -->
@@ -37,25 +37,26 @@
                         <textarea id="descPassoInput" placeholder="Descrição do passo a passo (etapa)"></textarea>
                         <input type="date" id="dataPassoInput" class="input-data-sutil">
                         
-                        <div class="form-footer">
-                            <div class="prioridade-seletores">
-                                <div class="bola-prioridade verde active" data-cor="verde" title="Baixa"></div>
-                                <div class="bola-prioridade laranja" data-cor="laranja" title="Média"></div>
-                                <div class="bola-prioridade vermelha" data-cor="vermelha" title="Alta"></div>
+                        <!-- Seletor de Prioridade com Estilo Garantido -->
+                        <div class="form-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                            <div class="prioridade-seletores" style="display: flex; gap: 12px; align-items: center;">
+                                <div class="bola-prioridade active" data-cor="verde" title="Baixa" style="width: 24px; height: 24px; background-color: #28a745; border-radius: 50%; cursor: pointer; border: 3px solid #000; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
+                                <div class="bola-prioridade" data-cor="laranja" title="Média" style="width: 24px; height: 24px; background-color: #ffc107; border-radius: 50%; cursor: pointer; border: 3px solid transparent; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
+                                <div class="bola-prioridade" data-cor="vermelha" title="Alta" style="width: 24px; height: 24px; background-color: #dc3545; border-radius: 50%; cursor: pointer; border: 3px solid transparent; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
                             </div>
-                            <img src="icone-check.png" alt="Salvar" class="icon-check-save" id="btnSalvarPasso">
+                            <img src="icone-check.png" alt="Salvar" class="icon-check-save" id="btnSalvarPasso" style="width: 30px; cursor: pointer;">
                         </div>
                     </div>
                 </div>
 
-                <!-- Nova Seção de Matérias Embaixo -->
+                <!-- Seção de Matérias Embaixo -->
                 <div class="area-materias">
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
                         <h3 style="font-size: 16px; font-weight: bold; margin: 0;">MATÉRIAS:</h3>
-                    <img src="icone-adicionar.png" class="icon-add" id="btnAdicionarMateria" onclick="abrirPromptAdicionarMateria()" style="cursor: pointer; width: 20px;" title="Adicionar Matéria">
+                        <img src="icone-adicionar.png" class="icon-add" id="btnAdicionarMateria" onclick="abrirPromptAdicionarMateria()" style="cursor: pointer; width: 20px;" title="Adicionar Matéria">
                     </div>
                     <div id="listaMateriasGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <!-- O JavaScript vai injetar os cartões das matérias aqui -->
+                        <!-- O JavaScript injeta as matérias aqui -->
                     </div>
                 </div>
 
@@ -70,7 +71,6 @@
                 <button class="action-btn action-btn-azul" onclick="window.location.href='avaliacoes.html'">Avaliações</button>
             </div>
             
-            <!-- Lixeira para apagar matérias -->
             <div class="delete-zone" style="margin-top: 40px; text-align: center;">
                 <img src="icone-lixeira.png" alt="Lixeira" id="btnLixeira" style="width: 40px; cursor: pointer; margin-bottom: 20px; transition: transform 0.2s;">
                 <div class="confirm-box" style="border: 2px solid #000; padding: 5px; width: 100%; height: 40px; display: flex; align-items: center; justify-content: center;">
