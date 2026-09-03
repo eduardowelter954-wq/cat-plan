@@ -140,22 +140,39 @@ document.addEventListener("DOMContentLoaded", () => {
         filtrarTarefasSemData(); // Refaz o filtro caso algo já esteja digitado
     }
 
-    const zonasDeSoltura = [document.getElementById('areaEspera'), ...document.querySelectorAll('.day-card')];
+const zonasDeSoltura = [document.getElementById('areaEspera'), ...document.querySelectorAll('.day-card')];
     
     zonasDeSoltura.forEach(zona => {
         if (!zona) return;
+        
         zona.addEventListener('dragover', (e) => {
             e.preventDefault();
-            zona.style.backgroundColor = 'rgba(0,0,0,0.05)';
+            // Dá um destaque visual quando a tarefa passa por cima
+            if (zona.id === 'areaEspera') {
+                zona.style.backgroundColor = '#8eb3ea'; // Azul um pouquinho mais escuro
+            } else {
+                zona.style.backgroundColor = 'rgba(0,0,0,0.05)';
+            }
         });
 
         zona.addEventListener('dragleave', () => {
-            zona.style.backgroundColor = '';
+            // Restaura a cor correta quando a tarefa sai de cima
+            if (zona.id === 'areaEspera') {
+                zona.style.backgroundColor = '#a3c4f3'; // Azul original
+            } else {
+                zona.style.backgroundColor = '';
+            }
         });
 
         zona.addEventListener('drop', (e) => {
             e.preventDefault();
-            zona.style.backgroundColor = '';
+            
+            // Restaura a cor correta quando a tarefa é solta
+            if (zona.id === 'areaEspera') {
+                zona.style.backgroundColor = '#a3c4f3'; // Azul original
+            } else {
+                zona.style.backgroundColor = '';
+            }
             
             const idTarefa = e.dataTransfer.getData('text/plain');
             let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
