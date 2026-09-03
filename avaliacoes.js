@@ -1,117 +1,220 @@
 document.addEventListener("DOMContentLoaded", () => {
+    
+    // --- 0. SINCRONIZAÇÃO COM A NUVEM ---
+    async function sincronizarComNuvem() {
+        const username = localStorage.getItem('usuarioLogado');
+        if (!username) return; 
 
-    const btnNova = document.getElementById('btnNovaAvaliacao');
-    const formAvaliacao = document.getElementById('formAvaliacao');
-    const btnCancelar = document.getElementById('btnCancelarAv');
-    const btnSalvar = document.getElementById('btnSalvarAv');
-    const container = document.getElementById('containerAvaliacoes');
-    const displayMediaTotal = document.getElementById('displayMediaTotal');
-
-    // Abre e fecha o formulário
-    btnNova.addEventListener('click', () => {
-        formAvaliacao.style.display = 'block';
-        document.getElementById('avDescricao').focus();
-    });
-
-    btnCancelar.addEventListener('click', () => {
-        formAvaliacao.style.display = 'none';
-        limparFormulario();
-    });
-
-    // Ao salvar a avaliação
-    btnSalvar.addEventListener('click', () => {
-        const descricao = document.getElementById('avDescricao').value.trim();
-        const materia = document.getElementById('avMateria').value.trim();
-        const notaTirada = parseFloat(document.getElementById('avTirada').value);
-        const notaMaxima = parseFloat(document.getElementById('avMaxima').value);
-
-        if (!descricao || !materia || isNaN(notaTirada) || isNaN(notaMaxima)) {
-            alert("Por favor, preencha todos os campos corretamente.");
-            return;
+        const dadosAtuais = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const chave = localStorage.key(i);
+            if (chave !== 'usuarioLogado' && chave !== 'catPlanDados') {
+                try {
+                    dadosAtuais[chave] = JSON.parse(localStorage.getItem(chave));
+                } catch(e) {
+                    dadosAtuais[chave] = localStorage.getItem(chave);
+                }
+            }
         }
 
-        if (notaMaxima === 0) {
-            alert("A nota máxima não pode ser zero!");
+        try {
+            await fetch('https://cat-plan.onrender.com/api/dados', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    username: username, 
+                    dados_do_site: dadosAtuais 
+                })
+            });
+            console.log("Miau! Avaliações sincronizadas com sucesso!");
+        } catch (error) {
+            console.error("Erro ao sincronizar com a nuvem:", error);
+        }
+    }
+
+    // --- SELETORES ---
+    const inputDesc = document.getElementById('descAvaliacaoInput');
+    const selectMateria = document.getElementById('selectMateriaAvaliacao');
+    const inputNotaTirada = document.getElementById('notaTiradaInput');
+    const inputNotaMaxima = document.getElementById('notaMaximaInput');
+    const btnSalvar = document.getElementById('btnSalvarAvaliacao');
+    const btnCancelar = document.getElementById('btnCancelarAvaliacao');
+    
+    const containerLista = document.getElementById('containerListaAvaliacoes');
+    const mediaTotalDisplay = document.getElementById('mediaTotalDisplay');
+
+    const selectPesquisaMateria = document.getElementById('selectPesquisaMateria');
+    const resultadoMateriaNome = document.getElementById('resultadoMateriaNome');
+    const resultadoMateriaMedia = document.getElementById('resultadoMateriaMedia');
+
+    // --- CARREGAR MATÉRIAS CADASTRADAS NO SISTEMA ---
+    function carregarMateriasNosSelects() {
+        const materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
+        
+        selectMateria.innerHTML = '<option value="">Selecione a Disciplina / Matéria</option>';
+        selectPesquisaMateria.innerHTML = '<option value="">Selecione a matéria...</option>';
+
+        materias.forEach(mat => {
+            const textoFormatado = `${mat.professor ? mat.professor + ' - ' : ''}${mat.nome}`;
+            
+            const opt1 = document.createElement('option');
+            opt1.value = textoFormatado;
+            opt1.textContent = textoFormatado;
+            selectMateria.appendChild(opt1);
+
+            const opt2 = document.createElement('option');
+            opt2.value = textoFormatado;
+            opt2.textContent = textoFormatado;
+            selectPesquisaMateria.appendChild(opt2);
+        });
+    }
+
+    // --- SALVAR AVALIAÇÃO ---
+    if (btnSalvar) {
+        btnSalvar.addEventListener('click', () => {
+            const descricao = inputDesc.value.trim();
+            const materiaProf = selectMateria.value;
+            const notaTirada = parseFloat(inputNotaTirada.value);
+            const notaMaxima = parseFloat(inputNotaMaxima.value) || 10;
+
+            if (!descricao || !materiaProf || isNaN(notaTirada)) {
+                alert("Por favor, preencha a descrição, selecione a matéria e informe a nota tirada!");
+                return;
+            }
+
+            const mediaCalculada = (notaTirada / notaMaxima) * 10;
+
+            const novaAvaliacao = {
+                id: Date.now(),
+                descricao: descricao,
+                materiaProf: materiaProf,
+                notaTirada: notaTirada,
+                notaMaxima: notaMaxima,
+                media: mediaCalculada
+            };
+
+            let avaliacoes = JSON.parse(localStorage.getItem('catPlanAvaliacoes')) || [];
+            avaliacoes.unshift(novaAvaliacao);
+            localStorage.setItem('catPlanAvaliacoes', JSON.stringify(avaliacoes));
+
+            inputDesc.value = "";
+            selectMateria.value = "";
+            inputNotaTirada.value = "";
+            inputNotaMaxima.value = "10";
+
+            atualizarTela();
+            sincronizarComNuvem();
+        });
+    }
+
+    if (btnCancelar) {
+        btnCancelar.addEventListener('click', () => {
+            inputDesc.value = "";
+            selectMateria.value = "";
+            inputNotaTirada.value = "";
+            inputNotaMaxima.value = "10";
+        });
+    }
+
+    // --- RENDERIZAR TUDO ---
+    function atualizarTela() {
+        carregarMateriasNosSelects();
+        desenharAvaliacoes();
+        calcularMediaTotal();
+        atualizarPesquisaMateria();
+    }
+
+    function desenharAvaliacoes() {
+        if (!containerLista) return;
+        containerLista.innerHTML = "";
+        let avaliacoes = JSON.parse(localStorage.getItem('catPlanAvaliacoes')) || [];
+
+        if (avaliacoes.length === 0) {
+            containerLista.innerHTML = `<p style="color: #666; font-style: italic; grid-column: 1 / -1;">Nenhuma avaliação cadastrada ainda.</p>`;
             return;
         }
-
-        // Calcula a média na base 10
-        const mediaBase10 = (notaTirada / notaMaxima) * 10;
-
-        const novaAv = {
-            id: Date.now(),
-            descricao: descricao,
-            materia: materia,
-            tirada: notaTirada,
-            maxima: notaMaxima,
-            media: mediaBase10
-        };
-
-        salvarAvaliacao(novaAv);
-        formAvaliacao.style.display = 'none';
-        limparFormulario();
-        carregarAvaliacoes();
-    });
-
-    function limparFormulario() {
-        document.getElementById('avDescricao').value = "";
-        document.getElementById('avMateria').value = "";
-        document.getElementById('avTirada').value = "";
-        document.getElementById('avMaxima').value = "";
-    }
-
-    function salvarAvaliacao(av) {
-        const avaliacoes = JSON.parse(localStorage.getItem('catPlanAvaliacoes')) || [];
-        avaliacoes.push(av);
-        localStorage.setItem('catPlanAvaliacoes', JSON.stringify(avaliacoes));
-    }
-
-    // Desenha os cartões e calcula a Média Total
-    function carregarAvaliacoes() {
-        container.innerHTML = "";
-        const avaliacoes = JSON.parse(localStorage.getItem('catPlanAvaliacoes')) || [];
-
-        let somaMedias = 0;
 
         avaliacoes.forEach(av => {
-            somaMedias += av.media;
+            const card = document.createElement('div');
+            card.style.background = "#fff";
+            card.style.border = "2px solid #000";
+            card.style.borderRadius = "12px";
+            card.style.padding = "18px";
+            card.style.boxShadow = "3px 3px 0px rgba(0,0,0,0.15)";
+            card.style.position = "relative";
+            card.style.display = "flex";
+            card.style.flexDirection = "column";
+            card.style.justifyContent = "space-between";
+            card.style.minHeight = "150px";
 
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'card-avaliacao';
-            cardDiv.style.position = 'relative';
-
-            // Arredonda para 1 casa decimal (Ex: 8.5)
-            const mediaFormatada = av.media.toFixed(1);
-
-            cardDiv.innerHTML = `
-                <h4>${av.descricao}</h4>
-                <p>${av.materia}</p>
-                <p style="margin-top: 10px;">Nota: ${av.tirada}/${av.maxima}</p>
-                <p>Média: ${mediaFormatada}/10</p>
-                <img src="icone-lixeira.png" class="btn-lixeira-card" onclick="excluirAvaliacao(${av.id})">
+            card.innerHTML = `
+                <div>
+                    <img src="lixo.png" class="btn-excluir-av" data-id="${av.id}" title="Excluir" style="width: 16px; cursor: pointer; position: absolute; top: 15px; right: 15px; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
+                    <h4 style="font-size: 15px; font-weight: bold; margin: 0 25px 10px 0; line-height: 1.3;">${av.descricao}</h4>
+                    <div style="font-size: 13px; color: #444; margin-bottom: 15px;">${av.materiaProf}</div>
+                </div>
+                <div style="border-top: 1px solid #eee; padding-top: 10px; font-size: 13px; display: flex; flex-direction: column; gap: 4px;">
+                    <div>Nota: ${av.notaTirada}/${av.notaMaxima}</div>
+                    <div style="font-weight: bold;">Média: ${av.media.toFixed(1)}/10</div>
+                </div>
             `;
-
-            container.appendChild(cardDiv);
+            containerLista.appendChild(card);
         });
 
-        // Atualiza a Média Total Geral
-        if (avaliacoes.length > 0) {
-            const mediaGeral = somaMedias / avaliacoes.length;
-            displayMediaTotal.innerText = `${mediaGeral.toFixed(1)}/10`;
-        } else {
-            displayMediaTotal.innerText = `0.0/10`;
-        }
+        document.querySelectorAll('.btn-excluir-av').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.target.getAttribute('data-id'));
+                if (confirm("Deseja apagar esta avaliação?")) {
+                    let avaliacoes = JSON.parse(localStorage.getItem('catPlanAvaliacoes')) || [];
+                    avaliacoes = avaliacoes.filter(av => av.id !== id);
+                    localStorage.setItem('catPlanAvaliacoes', JSON.stringify(avaliacoes));
+                    atualizarTela();
+                    sincronizarComNuvem();
+                }
+            });
+        });
     }
 
-    // Função global para o botão de lixeira no cartão
-    window.excluirAvaliacao = function(id) {
-        if (confirm("Deseja apagar esta avaliação?")) {
-            let avaliacoes = JSON.parse(localStorage.getItem('catPlanAvaliacoes')) || [];
-            avaliacoes = avaliacoes.filter(av => av.id !== id);
-            localStorage.setItem('catPlanAvaliacoes', JSON.stringify(avaliacoes));
-            carregarAvaliacoes();
+    function calcularMediaTotal() {
+        let avaliacoes = JSON.parse(localStorage.getItem('catPlanAvaliacoes')) || [];
+        if (avaliacoes.length === 0) {
+            mediaTotalDisplay.innerText = "0.0/10";
+            return;
         }
-    };
 
-    carregarAvaliacoes();
+        let soma = avaliacoes.reduce((acc, av) => acc + av.media, 0);
+        let mediaGeral = soma / avaliacoes.length;
+        mediaTotalDisplay.innerText = `${mediaGeral.toFixed(1)}/10`;
+    }
+
+    // --- PESQUISA DE MÉDIA POR MATÉRIA NA LATERAL ---
+    if (selectPesquisaMateria) {
+        selectPesquisaMateria.addEventListener('change', atualizarPesquisaMateria);
+    }
+
+    function atualizarPesquisaMateria() {
+        const materiaSelecionada = selectPesquisaMateria.value;
+        if (!materiaSelecionada) {
+            resultadoMateriaNome.innerText = "Matéria: -";
+            resultadoMateriaMedia.innerText = "Média: 00/10";
+            return;
+        }
+
+        resultadoMateriaNome.innerText = `Matéria: ${materiaSelecionada}`;
+        
+        let avaliacoes = JSON.parse(localStorage.getItem('catPlanAvaliacoes')) || [];
+        const avaliacoesDaMateria = avaliacoes.filter(av => av.materiaProf === materiaSelecionada);
+
+        if (avaliacoesDaMateria.length === 0) {
+            resultadoMateriaMedia.innerText = "Média: Sem notas";
+            return;
+        }
+
+        let soma = avaliacoesDaMateria.reduce((acc, av) => acc + av.media, 0);
+        let mediaMat = soma / avaliacoesDaMateria.length;
+        resultadoMateriaMedia.innerText = `Média: ${mediaMat.toFixed(1)}/10`;
+    }
+
+    // Inicialização
+    atualizarTela();
 });
