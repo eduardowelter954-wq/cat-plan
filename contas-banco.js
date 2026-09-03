@@ -70,21 +70,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- LÓGICA DE RENDERIZAR E EXCLUIR ---
-    function salvarERenderizarContas() {
+function salvarERenderizarContas() {
         localStorage.setItem('catPlanContasBancarias', JSON.stringify(contas));
         listaCadastrados.innerHTML = '';
 
+        // Puxa movimentações e gastos para calcular o saldo de cada conta
+        const movimentacoes = JSON.parse(localStorage.getItem('catPlanMovimentacoes')) || [];
+        const gastos = JSON.parse(localStorage.getItem('catPlanGastos')) || [];
+
         contas.forEach(conta => {
-            const li = document.createElement('li');
+            // Calcula o saldo atual da conta
+            let saldo = 0;
+
+            movimentacoes.forEach(m => {
+                if (m.contaOrigem === conta.nome) saldo -= m.valor;
+                if (m.contaDestino === conta.nome || (m.tipo.includes('Entrada') && m.conta === conta.nome)) saldo += m.valor;
+            });
+
+            gastos.forEach(g => {
+                if (g.conta === conta.nome) saldo -= g.valor;
+            });
+
+            const li = document.createElement('div');
             li.style.display = "flex";
             li.style.alignItems = "center";
-            li.style.gap = "15px"; // Espaço bonitinho entre o lixo e o texto
+            li.style.justifyContent = "space-between";
             li.style.marginBottom = "12px";
+            li.style.borderBottom = "1px dashed rgba(0,0,0,0.1)";
+            li.style.paddingBottom = "8px";
             
             li.innerHTML = `
-                <!-- Lixo colocado ANTES do texto para ficar à esquerda -->
+                <div>
+                    <strong style="font-size: 14px; display: block;">${conta.nome}</strong>
+                    <span style="font-size: 12px; color: ${saldo >= 0 ? '#2e7d32' : '#c62828'};">Saldo: R$ ${saldo.toFixed(2)}</span>
+                </div>
                 <img src="lixo.png" class="btn-excluir-conta" data-id="${conta.id}" title="Excluir" style="width: 20px; cursor: pointer;">
-                <span>${conta.nome}</span>
             `;
             listaCadastrados.appendChild(li);
         });
