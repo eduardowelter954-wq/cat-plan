@@ -4,7 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cat-Plan - Dashboard</title>
-    <link rel="stylesheet" href="dashboard.css">
+    <!-- Força o navegador a carregar a versão nova ignorando o cache -->
+    <link rel="stylesheet" href="dashboard.css?v=3">
+    <style>
+        /* Força a cor roxa suave nos cartões dos dias da semana nesta tela */
+        .day-card {
+            background-color: #f3e5f5 !important;
+            border: 2px solid #ab47bc !important;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+        }
+        .day-card h4 {
+            color: #4a148c;
+            margin-top: 0;
+            border-bottom: 1px solid #d1c4e9;
+            padding-bottom: 8px;
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-container" style="max-width: 1500px;">
@@ -28,7 +45,7 @@
                 <div class="date-navigation" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
                     <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
                         <button class="arrow-btn" id="btnDiaAnterior"><img src="seta-esquerda.png" alt="Anterior"></button>
-                        <h2 id="currentDate" style="margin: 0; font-size: 18px;">22/08/2026</h2>
+                        <h2 id="currentDate" style="margin: 0; font-size: 18px;">03/09/2026</h2>
                         <button class="arrow-btn" id="btnDiaSeguinte"><img src="seta-direita.png" alt="Próximo"></button>
                     </div>
                     <div style="position: relative; width: 30px; height: 30px;">
@@ -67,7 +84,7 @@
                 </div>
             </section>
 
-            <!-- COLUNA 3: Calendário da Semana (Todos os dias em blocos individuais empilhados) -->
+            <!-- COLUNA 3: Calendário da Semana (Ordem sequencial: Segunda a Domingo em blocos individuais) -->
             <section class="calendario-estudos" style="flex-grow: 1; min-width: 450px;">
                 <div class="week-grid" style="display: grid; grid-template-columns: 1fr; gap: 15px;">
                     <div class="day-card" id="dia-Segunda" data-diadasemana="Segunda">
