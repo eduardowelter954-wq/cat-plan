@@ -63,11 +63,10 @@ document.addEventListener("DOMContentLoaded", () => {
             divMov.className = 'card-movimentacao';
             
             divMov.innerHTML = `
-                <!-- Cabeçalho flexível para alinhar o título no centro e o lixo na direita perfeitamente dentro do cartão -->
-                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px;">
-                    <div style="width: 20px;"></div> <!-- Espaçador invisível para manter o título perfeitamente centralizado -->
-                    <div class="mov-titulo" style="margin-bottom: 0; flex-grow: 1; text-align: center;">${mov.tipo}</div>
-                    <img src="lixo.png" class="delete-mov-btn" data-id="${mov.id}" title="Excluir" style="width: 20px; cursor: pointer;">
+                <!-- Cabeçalho com título centralizado e lixeira recuada para a esquerda -->
+                <div style="display: flex; align-items: center; width: 100%; margin-bottom: 12px; position: relative;">
+                    <div class="mov-titulo" style="margin-bottom: 0; width: 100%; text-align: center;">${mov.tipo}</div>
+                    <img src="lixo.png" class="delete-mov-btn" data-id="${mov.id}" title="Excluir" style="width: 20px; cursor: pointer; position: absolute; right: 18px;">
                 </div>
                 
                 <div class="mov-linha">Descrição: <span>${mov.descricao}</span></div>
