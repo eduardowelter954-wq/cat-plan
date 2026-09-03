@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const areaEspera = document.getElementById('areaEspera');
         
         if (areaEspera) {
-            areaEspera.innerHTML = `<p style="color: #333; font-weight: bold; text-align: center; margin-bottom: 10px; width: 100%;">Tarefas Sem Data</p>`;
+            areaEspera.innerHTML = `<h3 style="color: #000; font-size: 18px; text-align: center; margin-bottom: 15px; margin-top: 0;">Tarefas Sem Data</h3>`;
         }
 
         const tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
