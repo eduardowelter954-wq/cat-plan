@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // --- 0. SUPER SINCRONIZAÇÃO COM A NUVEM ---
+    // --- 0. SUPER SINCRONIZAÇÃO COM A NUVEM (Segura e não bloqueante) ---
     async function sincronizarComNuvem() {
         const username = localStorage.getItem('usuarioLogado');
         if (!username) return; 
@@ -26,13 +26,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     dados_do_site: dadosAtuais 
                 })
             });
-            console.log("Miau! Cadastro de tarefas sincronizado com sucesso!");
+            console.log("Miau! Sincronizado com sucesso!");
         } catch (error) {
             console.error("Erro ao sincronizar com a nuvem:", error);
         }
     }
 
 
+    // --- VARIÁVEIS E SELETORES DO FORMULÁRIO ---
     const bolasPrioridade = document.querySelectorAll('.bola-prioridade');
     let prioridadeSelecionada = 'verde'; 
     const containerLista = document.getElementById('containerListaTarefas');
@@ -42,61 +43,74 @@ document.addEventListener("DOMContentLoaded", () => {
     const inputData = document.getElementById('dataPassoInput');
     const btnSalvar = document.getElementById('btnSalvarPasso');
 
+    // Inicializa a tela carregando dados salvos
     carregarTarefasNaTela();
-    desenharMaterias(); // Carrega a nova grade de matérias
+    desenharMaterias();
 
+    // --- SELEÇÃO DE PRIORIDADE BLINDADA ---
     bolasPrioridade.forEach(bola => {
         bola.addEventListener('click', (e) => {
-            bolasPrioridade.forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            prioridadeSelecionada = e.target.getAttribute('data-cor');
+            // Remove o destaque de todas e coloca borda preta apenas na clicada
+            bolasPrioridade.forEach(b => {
+                b.classList.remove('active');
+                b.style.border = "3px solid transparent";
+            });
+            
+            const elemento = e.currentTarget;
+            elemento.classList.add('active');
+            elemento.style.border = "3px solid #000"; // Borda preta destacando a escolha
+            prioridadeSelecionada = elemento.getAttribute('data-cor');
         });
     });
 
-    // Salvar novo passo
-    btnSalvar.addEventListener('click', () => {
-        const materia = inputMateria.value.trim().toUpperCase(); 
-        const tituloTarefa = inputTitulo.value.trim();
-        const descricaoPasso = inputDesc.value.trim();
-        let data = inputData.value;
-        
-        if (materia === "" || tituloTarefa === "" || descricaoPasso === "") {
-            alert("Por favor, preencha a Matéria, o Título da Tarefa e o Passo a Passo!");
-            return;
-        }
+    // --- SALVAR NOVO PASSO / TAREFA ---
+    if (btnSalvar) {
+        btnSalvar.addEventListener('click', () => {
+            const materia = inputMateria.value.trim().toUpperCase(); 
+            const tituloTarefa = inputTitulo.value.trim();
+            const descricaoPasso = inputDesc.value.trim();
+            let data = inputData.value;
+            
+            if (materia === "" || tituloTarefa === "" || descricaoPasso === "") {
+                alert("Por favor, preencha a Matéria, o Título da Tarefa e a Descrição do Passo!");
+                return;
+            }
 
-        if (!data) {
-            data = "00/00/0000";
-        } else {
-            const partes = data.split('-');
-            data = `${partes[2]}/${partes[1]}/${partes[0]}`;
-        }
+            if (!data) {
+                data = "00/00/0000";
+            } else {
+                const partes = data.split('-');
+                data = `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
 
-        const novoPasso = {
-            id: Date.now(),
-            materia: materia,
-            tituloTarefa: tituloTarefa,
-            descricao: descricaoPasso,
-            data: data,
-            prioridade: prioridadeSelecionada,
-            concluida: false
-        };
+            const novoPasso = {
+                id: Date.now(),
+                materia: materia,
+                tituloTarefa: tituloTarefa,
+                descricao: descricaoPasso,
+                data: data,
+                prioridade: prioridadeSelecionada,
+                concluida: false
+            };
 
-        salvarNoLocalStorage(novoPasso);
-        carregarTarefasNaTela();
-        sincronizarComNuvem(); 
-        
-        inputDesc.value = "";
-        inputData.value = "";
-    });
+            // Salva no LocalStorage
+            let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
+            tarefas.push(novoPasso);
+            localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
 
-    function salvarNoLocalStorage(passo) {
-        let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
-        tarefas.push(passo);
-        localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
+            // Atualiza a tela imediatamente
+            carregarTarefasNaTela();
+            sincronizarComNuvem(); 
+            
+            // Limpa os campos de texto do passo (mantém matéria e título para facilitar digitação em lote)
+            inputDesc.value = "";
+            inputData.value = "";
+        });
     }
 
+    // --- RENDERIZAÇÃO DAS TAREFAS NA ESQUERDA ---
     function carregarTarefasNaTela() {
+        if (!containerLista) return;
         containerLista.innerHTML = ""; 
         let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
 
@@ -117,23 +131,28 @@ document.addEventListener("DOMContentLoaded", () => {
         for (const [chave, grupo] of Object.entries(tarefasPorGrupo)) {
             const cardDiv = document.createElement('div');
             cardDiv.className = 'tarefa-principal-card';
+            cardDiv.style.backgroundColor = "#fff";
+            cardDiv.style.border = "2px solid #000";
+            cardDiv.style.borderRadius = "12px";
+            cardDiv.style.padding = "15px";
+            cardDiv.style.boxShadow = "3px 3px 0px rgba(0,0,0,0.15)";
             
             const passosPendentes = grupo.passos.filter(p => !p.concluida).length;
             
             cardDiv.innerHTML = `
-                <div class="tarefa-principal-header">
+                <div class="tarefa-principal-header" style="display: flex; justify-content: space-between; align-items: center;">
                     <div class="info-titulo" style="flex-grow: 1; cursor: pointer;">
                         <span style="font-size: 11px; font-weight: bold; background: #e0e0e0; padding: 2px 6px; border-radius: 4px;">${grupo.materia}</span>
-                        <h4 style="margin-top: 5px;" class="texto-titulo">${grupo.titulo}</h4>
+                        <h4 style="margin: 5px 0 0 0; font-size: 15px;" class="texto-titulo">${grupo.titulo}</h4>
                         <span style="font-size: 11px; color: #777;">${passosPendentes} etapa(s) restante(s) ▼</span>
                     </div>
-                    <div class="tarefa-acoes">
-                        <img src="icone-adicionar.png" alt="Adicionar passo" class="icone-acao btn-add-passo" title="Adicionar passo a passo">
-                        <img src="icone-editar.png" alt="Editar" class="icone-acao btn-editar" title="Editar Título da Tarefa">
-                        <img src="icone-check.png" alt="Concluir" class="icone-acao btn-concluir" title="Concluir o trabalho inteiro">
+                    <div class="tarefa-acoes" style="display: flex; gap: 8px;">
+                        <img src="icone-adicionar.png" alt="Adicionar passo" class="icone-acao btn-add-passo" style="width: 20px; cursor: pointer;" title="Adicionar passo a passo">
+                        <img src="icone-editar.png" alt="Editar" class="icone-acao btn-editar" style="width: 20px; cursor: pointer;" title="Editar Título da Tarefa">
+                        <img src="icone-check.png" alt="Concluir" class="icone-acao btn-concluir" style="width: 20px; cursor: pointer;" title="Concluir o trabalho inteiro">
                     </div>
                 </div>
-                <div class="passos-container" style="display: none; padding-top: 15px;"></div>
+                <div class="passos-container" style="display: none; padding-top: 12px; border-top: 1px solid #ddd; margin-top: 10px;"></div>
             `;
 
             const passosContainer = cardDiv.querySelector('.passos-container');
@@ -147,17 +166,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const passoDiv = document.createElement('div');
                 passoDiv.className = `passo-item prioridade-${passo.prioridade}`;
-                passoDiv.style.marginBottom = "8px";
+                passoDiv.style.marginBottom = "6px";
+                passoDiv.style.fontSize = "14px";
                 
                 passoDiv.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                         <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1;">
-                            <input type="checkbox" class="check-passo ${passo.prioridade}" onchange="marcarPassoFeito(${passo.id})"> 
+                            <input type="checkbox" class="check-passo" onchange="marcarPassoFeito(${passo.id})"> 
                             <span>${passo.descricao}</span>
                         </label>
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <span class="data-passo">${passo.data !== "00/00/0000" ? passo.data : ""}</span>
-                            <img src="icone-editar.png" style="width: 15px; cursor: pointer; opacity: 0.6;" onclick="editarPasso(${passo.id})" title="Editar este passo" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
+                            <span class="data-passo" style="font-size: 12px; color: #555;">${passo.data !== "00/00/0000" ? passo.data : ""}</span>
+                            <img src="icone-editar.png" style="width: 14px; cursor: pointer; opacity: 0.6;" onclick="editarPasso(${passo.id})" title="Editar este passo">
                         </div>
                     </div>
                 `;
@@ -246,47 +266,36 @@ document.addEventListener("DOMContentLoaded", () => {
             carregarTarefasNaTela(); 
             sincronizarComNuvem(); 
         }
-    }
+    });
 
-// ==========================================
+    // ==========================================
     // --- LÓGICA DAS MATÉRIAS E LIXEIRA ---
     // ==========================================
 
-    const btnAddMateria = document.getElementById('btnAdicionarMateria');
-    const listaMateriasGrid = document.getElementById('listaMateriasGrid');
-    
-    const btnLixeira = document.getElementById('btnLixeira');
-    const btnConfirmar = document.getElementById('btnConfirmarExclusao');
-    window.modoExclusaoGlobal = false;
-    let materiaParaExcluir = null;
+    window.abrirPromptAdicionarMateria = function() {
+        const nome = prompt("Nome da Matéria (Ex: MATEMÁTICA):");
+        if (!nome || nome.trim() === "") return;
+        
+        const professor = prompt("Nome do(a) Professor(a):") || "";
+        const dias = prompt("Dias da aula (Ex: Segunda, Quarta, Sábado, Domingo ou 'Nenhum'):") || "Nenhum";
 
-    if (btnAddMateria) {
-        // Garante que qualquer clique ou toque abra o prompt de cadastro
-        btnAddMateria.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            const nome = prompt("Nome da Matéria (Ex: MATEMÁTICA):");
-            if (!nome || nome.trim() === "") return;
-            
-            const professor = prompt("Nome do(a) Professor(a):") || "";
-            const dias = prompt("Dias da aula (Ex: Segunda, Quarta, Sábado, Domingo ou 'Nenhum'):") || "Nenhum";
+        const novaMateria = {
+            id: Date.now(),
+            nome: nome.trim().toUpperCase(),
+            professor: professor.trim(),
+            dias: dias.trim()
+        };
 
-            const novaMateria = {
-                id: Date.now(),
-                nome: nome.trim().toUpperCase(),
-                professor: professor.trim(),
-                dias: dias.trim()
-            };
+        const materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
+        materias.push(novaMateria);
+        localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
+        
+        desenharMaterias();
+        sincronizarComNuvem();
+    };
 
-            const materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
-            materias.push(novaMateria);
-            localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
-            desenharMaterias();
-            sincronizarComNuvem();
-        });
-    }
-
-    function desenharMaterias() {
+    window.desenharMaterias = function() {
+        const listaMateriasGrid = document.getElementById('listaMateriasGrid');
         if (!listaMateriasGrid) return;
         listaMateriasGrid.innerHTML = "";
         const materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
@@ -341,6 +350,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- LIXEIRA DE MATÉRIAS ---
+    const btnLixeira = document.getElementById('btnLixeira');
+    const btnConfirmar = document.getElementById('btnConfirmarExclusao');
+    window.modoExclusaoGlobal = false;
+    let materiaParaExcluir = null;
+
     if (btnLixeira) {
         btnLixeira.addEventListener('click', () => {
             window.modoExclusaoGlobal = !window.modoExclusaoGlobal;
@@ -392,6 +406,3 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         document.querySelectorAll('.materia-item-grid').forEach(m => m.style.backgroundColor = '#fff');
     }
-
-    // Chama a função logo na inicialização para desenhar as matérias salvas
-    desenharMaterias();
