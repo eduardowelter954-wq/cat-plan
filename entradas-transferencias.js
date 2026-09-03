@@ -6,6 +6,17 @@ document.addEventListener("DOMContentLoaded", () => {
     let movimentacoes = JSON.parse(localStorage.getItem('catPlanMovimentacoes')) || [];
     let contasCadastradas = JSON.parse(localStorage.getItem('catPlanContasBancarias')) || [];
 
+    // Função inteligente: aceita tanto o número da lista quanto o nome digitado
+    function resolverNomeConta(input) {
+        if (!input) return "";
+        input = input.trim();
+        const num = parseInt(input);
+        if (!isNaN(num) && num >= 1 && num <= contasCadastradas.length) {
+            return contasCadastradas[num - 1].nome;
+        }
+        return input;
+    }
+
     if (btnNovaMovimentacao) {
         btnNovaMovimentacao.addEventListener('click', () => {
             if (contasCadastradas.length === 0) {
@@ -21,7 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
             let contaOrigem = "-";
             let contaDestino = "-";
 
-            // Monta o texto com as contas cadastradas para escolha
             let textoContas = "Suas contas cadastradas:\n";
             contasCadastradas.forEach((c, idx) => {
                 textoContas += `${idx + 1} - ${c.nome}\n`;
@@ -29,25 +39,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (tipoEscolha.trim() === "1") {
                 tipoFinal = "ENTRADA (GANHO)";
-                const idxConta = prompt(textoContas + "\nDigite o número da conta onde o dinheiro vai entrar:");
-                if (!idxConta) return;
-                const contaSelecionada = contasCadastradas[parseInt(idxConta) - 1];
-                if (!contaSelecionada) { alert("Conta inválida!"); return; }
-                contaDestino = contaSelecionada.nome;
+                const inputConta = prompt(textoContas + "\nDigite o NÚMERO ou o NOME da conta onde o dinheiro vai entrar:");
+                if (!inputConta) return;
+                contaDestino = resolverNomeConta(inputConta);
             } 
             else if (tipoEscolha.trim() === "2") {
                 tipoFinal = "TRANSFERÊNCIA";
-                const idxOrigem = prompt(textoContas + "\nDigite o número da conta de ORIGEM (de onde sai):");
-                if (!idxOrigem) return;
-                const origemSel = contasCadastradas[parseInt(idxOrigem) - 1];
-                if (!origemSel) { alert("Conta de origem inválida!"); return; }
-                contaOrigem = origemSel.nome;
+                const inputOrigem = prompt(textoContas + "\nDigite o NÚMERO ou o NOME da conta de ORIGEM (de onde sai):");
+                if (!inputOrigem) return;
+                contaOrigem = resolverNomeConta(inputOrigem);
 
-                const idxDestino = prompt(textoContas + "\nDigite o número da conta de DESTINO (para onde vai):");
-                if (!idxDestino) return;
-                const destinoSel = contasCadastradas[parseInt(idxDestino) - 1];
-                if (!destinoSel) { alert("Conta de destino inválida!"); return; }
-                contaDestino = destinoSel.nome;
+                const inputDestino = prompt(textoContas + "\nDigite o NÚMERO ou o NOME da conta de DESTINO (para onde vai):");
+                if (!inputDestino) return;
+                contaDestino = resolverNomeConta(inputDestino);
             } else {
                 alert("Opção inválida.");
                 return;
@@ -89,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (mov.tipo === "TRANSFERÊNCIA") {
                 infoContas = `<div class="mov-linha">Origem ➔ Destino: <span>${mov.contaOrigem} ➔ ${mov.contaDestino}</span></div>`;
             } else {
-                infoContas = `<div class="mov-linha">Conta: <span>${mov.contaDestino}</span></div>`;
+                infoContas = `<div class="mov-linha">Conta: <span>${mov.contaDestino || mov.conta}</span></div>`;
             }
 
             divMov.innerHTML = `
