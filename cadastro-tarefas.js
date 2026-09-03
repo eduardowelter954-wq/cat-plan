@@ -248,7 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // ==========================================
+// ==========================================
     // --- LÓGICA DAS MATÉRIAS E LIXEIRA ---
     // ==========================================
 
@@ -261,7 +261,10 @@ document.addEventListener("DOMContentLoaded", () => {
     let materiaParaExcluir = null;
 
     if (btnAddMateria) {
-        btnAddMateria.addEventListener('click', () => {
+        // Garante que qualquer clique ou toque abra o prompt de cadastro
+        btnAddMateria.addEventListener('click', (e) => {
+            e.preventDefault();
+            
             const nome = prompt("Nome da Matéria (Ex: MATEMÁTICA):");
             if (!nome || nome.trim() === "") return;
             
@@ -290,7 +293,6 @@ document.addEventListener("DOMContentLoaded", () => {
         
         materias.forEach(mat => {
             const matDiv = document.createElement('div');
-            // CSS embutido para criar o cartão igual ao do seu print
             matDiv.style.border = "2px solid #000";
             matDiv.style.padding = "12px 15px";
             matDiv.style.backgroundColor = "#fff";
@@ -354,7 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function selecionarMateriaParaExcluir(e, nomeMateria, divElement) {
         if (!window.modoExclusaoGlobal) return;
         document.querySelectorAll('.materia-item-grid').forEach(m => m.style.backgroundColor = '#fff');
-        divElement.style.backgroundColor = '#ffcccc'; // Marca de vermelho ao selecionar
+        divElement.style.backgroundColor = '#ffcccc'; 
         materiaParaExcluir = nomeMateria;
     }
 
@@ -365,7 +367,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 materias = materias.filter(m => m.nome !== materiaParaExcluir);
                 localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
 
-                // Atualiza também as tarefas para não ficarem "órfãs"
                 let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
                 tarefas.forEach(t => {
                     if (t.materia === materiaParaExcluir) {
@@ -391,4 +392,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         document.querySelectorAll('.materia-item-grid').forEach(m => m.style.backgroundColor = '#fff');
     }
-});
+
+    // Chama a função logo na inicialização para desenhar as matérias salvas
+    desenharMaterias();
