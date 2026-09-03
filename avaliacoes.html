@@ -13,55 +13,79 @@
         <nav class="sidebar">
             <button class="menu-btn tarefas" onclick="window.location.href='dashboard.html'">Tarefas</button>
             <button class="menu-btn active estudos" onclick="window.location.href='estudos.html'">Estudos</button>
-            <button class="menu-btn financas" onclick="window.location.href='financas.html'">Finanças</button>
+            <button class="menu-btn financas" onclick="window.location.href='financas.html'">Finanças</button> 
             <button class="menu-btn organizacao">Organização</button>
             <button class="menu-btn hobby">Hobby</button>
         </nav>
 
-        <!-- Área Central (Avaliações) -->
-        <section class="avaliacoes-layout" style="flex-grow: 1; padding: 20px; display: flex; flex-direction: column;">
+        <!-- Área Central (Formulário + Média Total em cima, e Lista embaixo) -->
+        <section class="avaliacoes-layout" style="flex-grow: 1; padding: 20px; display: flex; flex-direction: column; gap: 30px;">
             
-            <!-- Botão Adicionar -->
-            <img src="icone-adicionar.png" alt="Adicionar" id="btnNovaAvaliacao" style="width: 25px; cursor: pointer; margin-bottom: 20px; transition: transform 0.2s;">
-            
-            <!-- Formulário Oculto (Aparece ao clicar no +) -->
-            <div class="card card-avaliacao" id="formAvaliacao" style="display: none; border-style: dashed; margin-bottom: 20px; width: 300px;">
-                <input type="text" id="avDescricao" placeholder="Descrição da Avaliação" class="input-edicao" style="font-weight: bold; margin-bottom: 10px;">
-                <input type="text" id="avMateria" placeholder="Professor - Matéria" class="input-edicao" style="margin-bottom: 15px;">
+            <!-- Linha Superior: Formulário de Cadastro + Card de Média Total -->
+            <div style="display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap;">
                 
-                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
-                    <input type="number" id="avTirada" placeholder="Nota tirada" class="input-edicao" style="width: 50%;">
-                    <span>/</span>
-                    <input type="number" id="avMaxima" placeholder="Nota máxima" class="input-edicao" style="width: 50%;">
+                <!-- Formulário de Avaliação -->
+                <div class="card form-cadastro" style="width: 380px; background: #fff; border: 2px solid #000; border-radius: 12px; padding: 20px; box-shadow: 3px 3px 0px rgba(0,0,0,0.15); position: relative;">
+                    <img src="icone-adicionar.png" alt="Adicionar" style="width: 22px; margin-bottom: 15px;">
+                    
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <input type="text" id="descAvaliacaoInput" placeholder="Descrição da Avaliação" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none;">
+                        
+                        <!-- Select preenchido automaticamente pelas matérias cadastradas -->
+                        <select id="selectMateriaAvaliacao" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; background: #fff;">
+                            <option value="">Selecione a Disciplina / Matéria</option>
+                        </select>
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" step="0.1" id="notaTiradaInput" placeholder="Nota tirada" style="width: 50%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none;">
+                            <input type="number" step="0.1" id="notaMaximaInput" placeholder="Nota máxima" value="10" style="width: 50%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none;">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; align-items: center; gap: 15px; margin-top: 20px;">
+                        <button id="btnCancelarAvaliacao" style="background: none; border: none; font-size: 14px; cursor: pointer; color: #555;">Cancelar</button>
+                        <img src="icone-check.png" alt="Salvar" id="btnSalvarAvaliacao" style="width: 28px; cursor: pointer;" title="Salvar Avaliação">
+                    </div>
                 </div>
-                
-                <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                    <button id="btnCancelarAv" style="padding: 5px 10px; cursor: pointer;">Cancelar</button>
-                    <img src="icone-check.png" id="btnSalvarAv" style="width: 25px; cursor: pointer;" title="Salvar">
+
+                <!-- Card de Média Total (No topo, ao lado do formulário) -->
+                <div style="width: 220px; height: 140px; background: #fff; border: 2px solid #000; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 3px 3px 0px rgba(0,0,0,0.15);">
+                    <span style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">Média total:</span>
+                    <span id="mediaTotalDisplay" style="font-size: 26px; font-weight: bold; color: #333;">0.0/10</span>
                 </div>
+
             </div>
 
-            <!-- Lista de Cartões de Avaliação -->
-            <div id="containerAvaliacoes" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; width: 100%;">
-                <!-- Os cartões entrarão aqui -->
+            <!-- Lista de Cards de Avaliações cadastradas -->
+            <div id="containerListaAvaliacoes" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                <!-- O JS injeta os cards aqui -->
             </div>
 
         </section>
 
-<!-- Painel Direito -->
-        <aside class="right-panel">
+        <!-- Painel Direito (Subguias + Pesquisa de Média por Matéria) -->
+        <aside class="right-panel" style="width: 300px; display: flex; flex-direction: column; gap: 25px; padding: 20px;">
             <div class="top-buttons">
                 <button class="action-btn action-btn-azul" onclick="window.location.href='estudos.html'">Calendário de tarefas</button>
                 <button class="action-btn action-btn-azul" onclick="window.location.href='cadastro-tarefas.html'">Cadastro de tarefas e checklist de etapas</button>
                 <button class="action-btn action-btn-azul active-page">Avaliações</button>
             </div>
             
-            <!-- Caixa da Média Total -->
-            <div class="card media-total-card" style="margin-top: 30px; text-align: center; width: 100%; padding: 20px 10px;">
-                <h4 style="margin-bottom: 10px; font-size: 15px;">Média total:</h4>
-                <p id="displayMediaTotal" style="font-size: 24px; font-weight: normal;">0.0/10</p>
+            <!-- Bloco de Pesquisa de Média por Matéria -->
+            <div style="background: #fff; border: 2px solid #000; border-radius: 12px; padding: 15px; box-shadow: 3px 3px 0px rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 12px; text-align: center;">
+                <h4 style="font-size: 13px; font-weight: bold; line-height: 1.4; margin: 0;">PESQUISE A SUA MÉDIA ENTRE AS MATÉRIAS CADASTRADAS:</h4>
+                
+                <select id="selectPesquisaMateria" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; outline: none; background: #fff;">
+                    <option value="">Selecione a matéria...</option>
+                </select>
+
+                <div style="background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-top: 5px;">
+                    <div id="resultadoMateriaNome" style="font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #333;">Matéria: -</div>
+                    <div id="resultadoMateriaMedia" style="font-size: 16px; font-weight: bold; color: #000;">Média: 00/10</div>
+                </div>
             </div>
-            
+
+            <img src="gato-preto.png" alt="Mascote Gato Preto" style="width: 120px; align-self: flex-end; margin-top: auto;">
         </aside>
 
     </div>
