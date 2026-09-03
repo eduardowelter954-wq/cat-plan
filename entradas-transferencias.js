@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+// --- LÓGICA DE RENDERIZAR E EXCLUIR ---
     function salvarERenderizarMovimentacoes() {
         localStorage.setItem('catPlanMovimentacoes', JSON.stringify(movimentacoes));
         containerMovimentacoes.innerHTML = '';
@@ -62,10 +63,13 @@ document.addEventListener("DOMContentLoaded", () => {
             divMov.className = 'card-movimentacao';
             
             divMov.innerHTML = `
-                <!-- Botão de lixeira para excluir o registro -->
-                <img src="lixo.png" class="delete-mov-btn" data-id="${mov.id}" title="Excluir" style="position: absolute; top: 25px; right: 25px; width: 20px; cursor: pointer;">
+                <!-- Cabeçalho flexível para alinhar o título no centro e o lixo na direita perfeitamente dentro do cartão -->
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px;">
+                    <div style="width: 20px;"></div> <!-- Espaçador invisível para manter o título perfeitamente centralizado -->
+                    <div class="mov-titulo" style="margin-bottom: 0; flex-grow: 1; text-align: center;">${mov.tipo}</div>
+                    <img src="lixo.png" class="delete-mov-btn" data-id="${mov.id}" title="Excluir" style="width: 20px; cursor: pointer;">
+                </div>
                 
-                <div class="mov-titulo">${mov.tipo}</div>
                 <div class="mov-linha">Descrição: <span>${mov.descricao}</span></div>
                 <div class="mov-linha">Quantidade: <span>R$ ${mov.valor.toFixed(2)}</span></div>
                 <div class="mov-linha">Conta / Movimento: <span>${mov.conta}</span></div>
