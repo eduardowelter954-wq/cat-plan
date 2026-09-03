@@ -18,35 +18,51 @@
             <button class="menu-btn hobby">Hobby</button>
         </nav>
 
-        <!-- COLUNA 2 e 3: Área de Cadastro e Lista -->
-        <section class="cadastro-layout">
+        <!-- COLUNA 2 e 3: Área de Lista (Esquerda) e Cadastro/Matérias (Direita) -->
+        <section class="cadastro-layout" style="display: flex; gap: 40px; flex-grow: 1; padding: 20px; align-items: flex-start;">
             
-            <!-- Formulário de Cadastro Único -->
-            <div class="area-formulario">
-                <img src="icone-adicionar.png" alt="Adicionar Nova" class="icon-add" style="margin-bottom: 10px; width: 20px;">
+            <!-- Lista de Tarefas agora na Esquerda -->
+            <div class="area-lista-tarefas" id="containerListaTarefas" style="flex: 1.2; display: flex; flex-direction: column; gap: 15px; min-width: 400px;"></div>
+            
+            <!-- Formulário e Matérias na Direita -->
+            <div class="area-direita" style="flex: 1; display: flex; flex-direction: column; gap: 40px; min-width: 400px;">
                 
-                <div class="card form-cadastro">
-                    <input type="text" id="materiaInput" placeholder="MATÉRIA" class="input-titulo-materia">
-                    <input type="text" id="tituloTarefaInput" placeholder="Título do Trabalho / Tarefa" class="input-titulo-materia" style="font-size: 13px; font-weight: normal;">
-                    <textarea id="descPassoInput" placeholder="Descrição do passo a passo (etapa)"></textarea>
-                    <input type="date" id="dataPassoInput" class="input-data-sutil">
+                <!-- Formulário de Cadastro Único -->
+                <div class="area-formulario">
+                    <img src="icone-adicionar.png" alt="Adicionar Nova" class="icon-add" style="margin-bottom: 10px; width: 25px;">
                     
-                    <div class="form-footer">
-                        <div class="prioridade-seletores">
-                            <div class="bola-prioridade verde active" data-cor="verde" title="Baixa"></div>
-                            <div class="bola-prioridade laranja" data-cor="laranja" title="Média"></div>
-                            <div class="bola-prioridade vermelha" data-cor="vermelha" title="Alta"></div>
+                    <div class="card form-cadastro">
+                        <input type="text" id="materiaInput" placeholder="MATÉRIA" class="input-titulo-materia">
+                        <input type="text" id="tituloTarefaInput" placeholder="TÍTULO DO TRABALHO / TAREFA" class="input-titulo-materia" style="font-size: 13px; font-weight: normal;">
+                        <textarea id="descPassoInput" placeholder="Descrição do passo a passo (etapa)"></textarea>
+                        <input type="date" id="dataPassoInput" class="input-data-sutil">
+                        
+                        <div class="form-footer">
+                            <div class="prioridade-seletores">
+                                <div class="bola-prioridade verde active" data-cor="verde" title="Baixa"></div>
+                                <div class="bola-prioridade laranja" data-cor="laranja" title="Média"></div>
+                                <div class="bola-prioridade vermelha" data-cor="vermelha" title="Alta"></div>
+                            </div>
+                            <img src="icone-check.png" alt="Salvar" class="icon-check-save" id="btnSalvarPasso">
                         </div>
-                        <img src="icone-check.png" alt="Salvar" class="icon-check-save" id="btnSalvarPasso">
                     </div>
                 </div>
-            </div>
 
-            <!-- Lista de Tarefas -->
-            <div class="area-lista-tarefas" id="containerListaTarefas"></div>
+                <!-- Nova Seção de Matérias Embaixo -->
+                <div class="area-materias">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                        <h3 style="font-size: 16px; font-weight: bold; margin: 0;">MATÉRIAS:</h3>
+                        <img src="icone-adicionar.png" class="icon-add" id="btnAdicionarMateria" style="cursor: pointer; width: 20px;">
+                    </div>
+                    <div id="listaMateriasGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <!-- O JavaScript vai injetar os cartões das matérias aqui -->
+                    </div>
+                </div>
+
+            </div>
         </section>
 
-<!-- COLUNA 4: Painel Direito -->
+        <!-- COLUNA 4: Painel Direito -->
         <aside class="right-panel">
             <div class="top-buttons">
                 <button class="action-btn action-btn-azul" onclick="window.location.href='estudos.html'">Calendário de tarefas</button>
@@ -54,7 +70,13 @@
                 <button class="action-btn action-btn-azul" onclick="window.location.href='avaliacoes.html'">Avaliações</button>
             </div>
             
-            <img src="gato-preto.png" alt="Mascote" style="width: 140px; align-self: flex-end; margin-top: auto;">
+            <!-- Lixeira para apagar matérias -->
+            <div class="delete-zone" style="margin-top: 40px; text-align: center;">
+                <img src="icone-lixeira.png" alt="Lixeira" id="btnLixeira" style="width: 40px; cursor: pointer; margin-bottom: 20px; transition: transform 0.2s;">
+                <div class="confirm-box" style="border: 2px solid #000; padding: 5px; width: 100%; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <img src="icone-check.png" id="btnConfirmarExclusao" style="width: 25px; cursor: pointer;">
+                </div>
+            </div>
         </aside>
 
     </div>
