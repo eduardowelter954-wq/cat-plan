@@ -1,65 +1,45 @@
 document.addEventListener("DOMContentLoaded", async () => {
     
-    // --- 0. SINCRONIZAÇÃO COMPLETA COM A NUVEM (BAIXAR E ENVIAR) ---
-    
+    // --- 0. SINCRONIZAÇÃO COM A NUVEM ---
     async function baixarDadosDaNuvem() {
         const username = localStorage.getItem('usuarioLogado');
         if (!username) return;
-
         try {
             const resposta = await fetch(`https://cat-plan.onrender.com/api/dados?username=${username}`);
             if (resposta.ok) {
                 const resultado = await resposta.json();
-                // Se houver dados no servidor, atualiza o navegador localmente
                 if (resultado && resultado.dados_do_site) {
                     for (const [chave, valor] of Object.entries(resultado.dados_do_site)) {
                         localStorage.setItem(chave, typeof valor === 'string' ? valor : JSON.stringify(valor));
                     }
-                    console.log("Miau! Dados baixados e sincronizados da nuvem com sucesso!");
                 }
             }
-        } catch (error) {
-            console.error("Erro ao baixar dados da nuvem:", error);
-        }
+        } catch (error) { console.error("Erro ao baixar dados da nuvem:", error); }
     }
 
-    // Função para enviar os dados para a nuvem
     async function sincronizarComNuvem() {
         const username = localStorage.getItem('usuarioLogado');
         if (!username) return; 
-
         const dadosAtuais = {};
         for (let i = 0; i < localStorage.length; i++) {
             const chave = localStorage.key(i);
             if (chave !== 'usuarioLogado' && chave !== 'catPlanDados') {
-                try {
-                    dadosAtuais[chave] = JSON.parse(localStorage.getItem(chave));
-                } catch(e) {
-                    dadosAtuais[chave] = localStorage.getItem(chave);
-                }
+                try { dadosAtuais[chave] = JSON.parse(localStorage.getItem(chave)); } 
+                catch(e) { dadosAtuais[chave] = localStorage.getItem(chave); }
             }
         }
-
         try {
             await fetch('https://cat-plan.onrender.com/api/dados', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    username: username, 
-                    dados_do_site: dadosAtuais 
-                })
+                body: JSON.stringify({ username: username, dados_do_site: dadosAtuais })
             });
-            console.log("Miau! TODOS os dados do Cat-Plan sincronizados com sucesso!");
-        } catch (error) {
-            console.error("Erro ao sincronizar com a nuvem:", error);
-        }
+        } catch (error) {}
     }
 
-    // PRIMEIRO DE TUDO: Baixa os dados mais recentes do servidor antes de desenhar a tela!
     await baixarDadosDaNuvem();
 
-
-    // --- VARIÁVEIS DE TEMPO E ELEMENTOS ---
+    // --- VARIÁVEIS E SELETORES ---
     let dataAtual = new Date(); 
     
     const displayData = document.getElementById('currentDate');
@@ -67,27 +47,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     const btnProx = document.getElementById('btnDiaSeguinte');
     const calendarioPicker = document.getElementById('calendarioPicker');
 
-    // Elementos da Rotina e Filtros
     const listaRotina = document.getElementById('listaRotina');
     const inputRotina = document.getElementById('novaRotinaInput');
     const btnAddRotina = document.getElementById('btnAdicionarRotina');
     const btnEditarRotina = document.getElementById('btnEditarRotina');
-    const filtroRotina = document.getElementById('filtroRotina');
-    const filtroCompromisso = document.getElementById('filtroCompromisso');
     let modoEdicaoRotina = false;
 
-    // Elementos de Tarefas
     const listaTarefas = document.getElementById('listaTarefasHoje');
     const inputTarefa = document.getElementById('novaTarefaInput');
     const btnAddTarefa = document.getElementById('btnAdicionarTarefa');
+    const areaEspera = document.getElementById('areaEspera');
+    const inputPesquisa = document.getElementById('inputPesquisaDashboard');
 
+    const diasDaSemanaNome = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 
-    // --- 1. NAVEGAÇÃO DE DATAS ---
-    
+    // --- 1. NAVEGAÇÃO DE DATAS E CALENDÁRIO ---
     function formatarDataParaTela(data) {
         return String(data.getDate()).padStart(2, '0') + '/' + 
                String(data.getMonth() + 1).padStart(2, '0') + '/' + 
                data.getFullYear();
+    }
+
+    function converterDDMMparaYYYYMM(ddmm) {
+        if(ddmm === '00/00/0000') return "";
+        const p = ddmm.split('/');
+        return `${p[2]}-${p[1]}-${p[0]}`;
     }
 
     function atualizarTelaInteira() {
@@ -95,8 +79,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         displayData.innerText = dataStr;
         calendarioPicker.value = `${dataAtual.getFullYear()}-${String(dataAtual.getMonth() + 1).padStart(2, '0')}-${String(dataAtual.getDate()).padStart(2, '0')}`;
         
-        carregarRotinasECompromissos(dataStr);
-        carregarTarefas(dataStr);
+        // Define a grade da semana baseada na dataAtual
+        const diaSemana = dataAtual.getDay();
+        const diferencaParaSegunda = dataAtual.getDate() - diaSemana + (diaSemana === 0 ? -6 : 1);
+        const segundaFeira = new Date(new Date(dataAtual).setDate(diferencaParaSegunda));
+
+        for (let i = 0; i < 7; i++) {
+            let tempDate = new Date(segundaFeira);
+            tempDate.setDate(segundaFeira.getDate() + i);
+            const diaStr = formatarDataParaTela(tempDate);
+            const nomeDia = diasDaSemanaNome[tempDate.getDay()];
+            
+            const cardDia = document.getElementById(`dia-${nomeDia}`);
+            const headDia = document.getElementById(`head-${nomeDia}`);
+            
+            if(cardDia && headDia) {
+                cardDia.setAttribute('data-data', diaStr);
+                headDia.innerHTML = `${nomeDia}<br><span>${diaStr}</span>`;
+            }
+        }
+        
+        carregarTudo(dataStr);
     }
 
     btnAnt.addEventListener('click', () => { dataAtual.setDate(dataAtual.getDate() - 1); atualizarTelaInteira(); });
@@ -109,12 +112,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    if(filtroRotina) filtroRotina.addEventListener('change', () => carregarRotinasECompromissos(displayData.innerText));
-    if(filtroCompromisso) filtroCompromisso.addEventListener('change', () => carregarRotinasECompromissos(displayData.innerText));
-
-
-    // --- 2. LÓGICA DA ROTINA E COMPROMISSOS (CARTÃO ESQUERDO) ---
-    
+    // --- 2. ADIÇÃO DE DADOS (ROTINA E TAREFAS DIÁRIAS) ---
     btnAddRotina.addEventListener('click', () => {
         const texto = inputRotina.value.trim();
         if (texto !== "") {
@@ -122,7 +120,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             rotinas.push({ id: Date.now(), texto: texto });
             localStorage.setItem('catPlanRotinasGlobal', JSON.stringify(rotinas));
             inputRotina.value = "";
-            carregarRotinasECompromissos(displayData.innerText);
+            carregarTudo(displayData.innerText);
             sincronizarComNuvem();
         }
     });
@@ -131,102 +129,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         modoEdicaoRotina = !modoEdicaoRotina;
         btnEditarRotina.style.transform = modoEdicaoRotina ? "scale(1.2)" : "scale(1)";
         btnEditarRotina.style.filter = modoEdicaoRotina ? "drop-shadow(0 0 5px red)" : "none";
-        carregarRotinasECompromissos(displayData.innerText);
+        carregarTudo(displayData.innerText);
     });
-
-    function carregarRotinasECompromissos(dataStr) {
-        listaRotina.innerHTML = "";
-        
-        if (filtroRotina && filtroRotina.checked) {
-            let rotinas = JSON.parse(localStorage.getItem('catPlanRotinasGlobal')) || [];
-            let checksPorDia = JSON.parse(localStorage.getItem('catPlanRotinasChecks')) || {};
-            let concluidasHoje = checksPorDia[dataStr] || [];
-
-            rotinas.forEach(rotina => {
-                const li = document.createElement('li');
-                li.style.display = 'flex';
-                li.style.alignItems = 'center';
-                li.style.justifyContent = 'space-between';
-                li.style.marginBottom = '8px';
-
-                const isChecked = concluidasHoje.includes(rotina.id);
-
-                li.innerHTML = `
-                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1; text-decoration: ${isChecked ? 'line-through' : 'none'}; opacity: ${isChecked ? '0.6' : '1'};">
-                        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleRotina(${rotina.id}, '${dataStr}')">
-                        <span>${rotina.texto}</span>
-                    </label>
-                    ${modoEdicaoRotina ? `<img src="icone-lixeira.png" style="width: 16px; cursor: pointer;" onclick="excluirRotina(${rotina.id})">` : ''}
-                `;
-                listaRotina.appendChild(li);
-            });
-        }
-
-        if (filtroCompromisso && filtroCompromisso.checked) {
-            const partes = dataStr.split('/');
-            const dataCompFormat = `${partes[2]}-${partes[1]}-${partes[0]}`; 
-            
-            let todosCompromissos = JSON.parse(localStorage.getItem('catPlanCompromissos')) || [];
-            let compromissosHoje = todosCompromissos.filter(c => c.data === dataCompFormat);
-
-            if (filtroRotina && filtroRotina.checked && listaRotina.children.length > 0 && compromissosHoje.length > 0) {
-                const divisor = document.createElement('div');
-                divisor.style.borderTop = "1px dashed #dcdcdc";
-                divisor.style.margin = "10px 0";
-                listaRotina.appendChild(divisor);
-            }
-
-            compromissosHoje.forEach(comp => {
-                const li = document.createElement('li');
-                li.style.display = 'flex';
-                li.style.alignItems = 'center';
-                li.style.marginBottom = '8px';
-
-                li.innerHTML = `
-                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1; text-decoration: ${comp.concluido ? 'line-through' : 'none'}; opacity: ${comp.concluido ? '0.6' : '1'};">
-                        <input type="checkbox" class="compromisso-checkbox" ${comp.concluido ? 'checked' : ''} onchange="toggleCompromissoDashboard(${comp.id}, '${dataStr}')">
-                        <span><strong style="font-size: 11px; background: #ebd9fc; padding: 2px 6px; border-radius: 4px; margin-right: 5px;">COMPROMISSO</strong> ${comp.descricao}</span>
-                    </label>
-                `;
-                listaRotina.appendChild(li);
-            });
-        }
-    }
-
-    window.toggleRotina = function(idRotina, dataStr) {
-        let checksPorDia = JSON.parse(localStorage.getItem('catPlanRotinasChecks')) || {};
-        if (!checksPorDia[dataStr]) checksPorDia[dataStr] = [];
-        const index = checksPorDia[dataStr].indexOf(idRotina);
-        if (index > -1) checksPorDia[dataStr].splice(index, 1);
-        else checksPorDia[dataStr].push(idRotina);
-        localStorage.setItem('catPlanRotinasChecks', JSON.stringify(checksPorDia));
-        carregarRotinasECompromissos(dataStr); 
-        sincronizarComNuvem();
-    }
-
-    window.excluirRotina = function(idRotina) {
-        if(confirm("Apagar este item da rotina permanentemente?")) {
-            let rotinas = JSON.parse(localStorage.getItem('catPlanRotinasGlobal')) || [];
-            rotinas = rotinas.filter(r => r.id !== idRotina);
-            localStorage.setItem('catPlanRotinasGlobal', JSON.stringify(rotinas));
-            carregarRotinasECompromissos(displayData.innerText);
-            sincronizarComNuvem();
-        }
-    }
-
-    window.toggleCompromissoDashboard = function(idComp, dataStr) {
-        let todosCompromissos = JSON.parse(localStorage.getItem('catPlanCompromissos')) || [];
-        const index = todosCompromissos.findIndex(c => c.id === idComp);
-        if (index !== -1) {
-            todosCompromissos[index].concluido = !todosCompromissos[index].concluido;
-            localStorage.setItem('catPlanCompromissos', JSON.stringify(todosCompromissos));
-            carregarRotinasECompromissos(dataStr);
-            sincronizarComNuvem();
-        }
-    }
-
-
-    // --- 3. LÓGICA DE TAREFAS PONTUAIS (CARTÃO DIREITO) ---
 
     btnAddTarefa.addEventListener('click', () => {
         const texto = inputTarefa.value.trim();
@@ -237,7 +141,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             todasTarefas[dataStr].push({ id: Date.now(), texto: texto, concluida: false });
             localStorage.setItem('catPlanTarefasDiarias', JSON.stringify(todasTarefas));
             inputTarefa.value = "";
-            carregarTarefas(dataStr);
+            carregarTudo(dataStr);
             sincronizarComNuvem();
         }
     });
@@ -245,51 +149,290 @@ document.addEventListener("DOMContentLoaded", async () => {
     inputTarefa.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); btnAddTarefa.click(); } });
     inputRotina.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); btnAddRotina.click(); } });
 
-    function carregarTarefas(dataStr) {
+    // --- 3. MOTOR DE RENDERIZAÇÃO GERAL E ARRASTAR/SOLTAR ---
+    function criarElementoArrastavel(id, tipo, texto, dataAntiga, corFundo = '#fff', tag = '') {
+        const div = document.createElement('div');
+        div.className = 'tarefa-arrastavel';
+        div.draggable = true;
+        div.style.backgroundColor = corFundo;
+        div.style.border = "2px solid #000";
+        div.style.borderRadius = "8px";
+        div.style.padding = "10px";
+        div.style.marginBottom = "8px";
+        div.style.cursor = "grab";
+        div.style.fontSize = "13px";
+        div.style.fontWeight = "bold";
+        div.setAttribute('data-desc', texto.toLowerCase());
+        
+        let conteudo = tag ? `<div style="font-size:10px; background:#e0e0e0; padding:2px 6px; border-radius:4px; display:inline-block; margin-bottom:4px;">${tag}</div><br>` : '';
+        conteudo += `<span>${texto}</span>`;
+        div.innerHTML = conteudo;
+
+        div.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', JSON.stringify({ id: id, type: tipo, oldDate: dataAntiga }));
+            setTimeout(() => div.style.opacity = '0.5', 0);
+        });
+        div.addEventListener('dragend', () => div.style.opacity = '1');
+        
+        return div;
+    }
+
+    function carregarTudo(dataStr) {
+        // Limpa todas as áreas
+        listaRotina.innerHTML = "";
         listaTarefas.innerHTML = "";
-        let todasTarefas = JSON.parse(localStorage.getItem('catPlanTarefasDiarias')) || {};
-        let tarefasHoje = todasTarefas[dataStr] || [];
+        document.querySelectorAll('.tasks-container').forEach(c => c.innerHTML = "");
+        if (areaEspera) areaEspera.innerHTML = `<h3 style="color: #4a148c; font-size: 16px; text-align: center; margin-bottom: 10px; margin-top: 0;">Tarefas e Compromissos Sem Data</h3>`;
 
-        tarefasHoje.forEach(tarefa => {
+        // 3.1. ROTINAS (Fixas no cartão esquerdo)
+        let rotinas = JSON.parse(localStorage.getItem('catPlanRotinasGlobal')) || [];
+        let checksPorDia = JSON.parse(localStorage.getItem('catPlanRotinasChecks')) || {};
+        let concluidasHoje = checksPorDia[dataStr] || [];
+
+        rotinas.forEach(rotina => {
+            const isChecked = concluidasHoje.includes(rotina.id);
             const li = document.createElement('li');
-            li.style.display = 'flex';
-            li.style.alignItems = 'center';
-            li.style.marginBottom = '8px';
-
+            li.style.display = 'flex'; li.style.alignItems = 'center'; li.style.justifyContent = 'space-between'; li.style.marginBottom = '8px';
             li.innerHTML = `
-                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1; text-decoration: ${tarefa.concluida ? 'line-through' : 'none'}; opacity: ${tarefa.concluida ? '0.6' : '1'};">
-                    <input type="checkbox" ${tarefa.concluida ? 'checked' : ''} onchange="toggleTarefa(${tarefa.id}, '${dataStr}')">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1; text-decoration: ${isChecked ? 'line-through' : 'none'}; opacity: ${isChecked ? '0.6' : '1'};">
+                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleRotina(${rotina.id}, '${dataStr}')">
+                    <span>${rotina.texto}</span>
+                </label>
+                ${modoEdicaoRotina ? `<img src="icone-lixeira.png" style="width: 16px; cursor: pointer;" onclick="excluirRotina(${rotina.id})">` : ''}
+            `;
+            listaRotina.appendChild(li);
+        });
+
+        // 3.2. COMPROMISSOS & TAREFAS DIÁRIAS (No cartão esquerdo e na grade/painel roxo)
+        let todosCompromissos = JSON.parse(localStorage.getItem('catPlanCompromissos')) || [];
+        let todasTarefasDiarias = JSON.parse(localStorage.getItem('catPlanTarefasDiarias')) || {};
+        let todasTarefasEstudos = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
+
+        // Preenche o Cartão Esquerdo "Tarefa para o dia"
+        const dataCompFormat = converterDDMMparaYYYYMM(dataStr);
+        let compromissosHoje = todosCompromissos.filter(c => c.data === dataCompFormat && !c.concluido);
+        let tarefasDiariasHoje = todasTarefasDiarias[dataStr] || [];
+        tarefasDiariasHoje = tarefasDiariasHoje.filter(t => !t.concluida); // Ignora as concluídas (Elas somem!)
+
+        compromissosHoje.forEach(comp => {
+            const li = document.createElement('li');
+            li.style.display = 'flex'; li.style.alignItems = 'center'; li.style.marginBottom = '8px';
+            li.innerHTML = `
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1;">
+                    <input type="checkbox" onchange="toggleCompromissoDashboard(${comp.id}, '${dataStr}')">
+                    <span><strong style="font-size: 11px; background: #e5ccff; color: #4a148c; padding: 2px 6px; border-radius: 4px; margin-right: 5px;">COMPROMISSO</strong> ${comp.descricao}</span>
+                </label>
+            `;
+            listaTarefas.appendChild(li);
+        });
+
+        tarefasDiariasHoje.forEach(tarefa => {
+            const li = document.createElement('li');
+            li.style.display = 'flex'; li.style.alignItems = 'center'; li.style.marginBottom = '8px';
+            li.innerHTML = `
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1;">
+                    <input type="checkbox" onchange="toggleTarefaDiaria(${tarefa.id}, '${dataStr}')">
                     <span>${tarefa.texto}</span>
                 </label>
                 <img src="icone-lixeira.png" style="width: 16px; cursor: pointer; margin-left: 10px; opacity: 0.5;" onclick="excluirTarefa(${tarefa.id}, '${dataStr}')" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">
             `;
             listaTarefas.appendChild(li);
         });
+
+
+        // 3.3. DISTRIBUIR NA GRADE E NO PAINEL ROXO (Apenas itens não concluídos)
+        
+        // Tarefas de Estudos
+        todasTarefasEstudos.forEach(t => {
+            if (t.concluida) return;
+            let cor = '#fff';
+            if(t.prioridade === 'verde') cor = '#d4edda';
+            if(t.prioridade === 'laranja') cor = '#ffeeba';
+            if(t.prioridade === 'vermelha') cor = '#f8d7da';
+            
+            const el = criarElementoArrastavel(t.id, 'estudo', t.descricao, t.data, cor, t.materia);
+            
+            if (t.data === "00/00/0000" || t.data === "ESPERA") {
+                if (areaEspera) areaEspera.appendChild(el);
+            } else {
+                const dayCard = document.querySelector(`.day-card[data-data="${t.data}"] .tasks-container`);
+                if (dayCard) dayCard.appendChild(el);
+            }
+        });
+
+        // Tarefas Diárias (Todas as datas)
+        for (const [dataChave, arrTarefas] of Object.entries(todasTarefasDiarias)) {
+            arrTarefas.forEach(t => {
+                if (t.concluida) return;
+                const el = criarElementoArrastavel(t.id, 'diaria', t.texto, dataChave, '#f4f4f4', 'TAREFA GERAL');
+                
+                if (dataChave === "00/00/0000" || dataChave === "ESPERA") {
+                    if (areaEspera) areaEspera.appendChild(el);
+                } else {
+                    const dayCard = document.querySelector(`.day-card[data-data="${dataChave}"] .tasks-container`);
+                    if (dayCard) dayCard.appendChild(el);
+                }
+            });
+        }
+
+        // Compromissos (Todas as datas)
+        todosCompromissos.forEach(c => {
+            if (c.concluido) return;
+            // Compromissos usam YYYY-MM-DD. Precisamos converter para a lógica do DD/MM/YYYY
+            let dataPadrao = "00/00/0000";
+            if (c.data && c.data !== "") {
+                const p = c.data.split('-');
+                dataPadrao = `${p[2]}/${p[1]}/${p[0]}`;
+            }
+            
+            const el = criarElementoArrastavel(c.id, 'compromisso', c.descricao, c.data, '#e5ccff', 'COMPROMISSO');
+            
+            if (dataPadrao === "00/00/0000") {
+                if (areaEspera) areaEspera.appendChild(el);
+            } else {
+                const dayCard = document.querySelector(`.day-card[data-data="${dataPadrao}"] .tasks-container`);
+                if (dayCard) dayCard.appendChild(el);
+            }
+        });
+        
+        filtrarPainelRoxo();
     }
 
-    window.toggleTarefa = function(idTarefa, dataStr) {
+
+    // --- 4. FUNÇÕES DE STATUS (CONCLUIR / APAGAR) ---
+    window.toggleRotina = function(idRotina, dataStr) {
+        let checksPorDia = JSON.parse(localStorage.getItem('catPlanRotinasChecks')) || {};
+        if (!checksPorDia[dataStr]) checksPorDia[dataStr] = [];
+        const index = checksPorDia[dataStr].indexOf(idRotina);
+        if (index > -1) checksPorDia[dataStr].splice(index, 1);
+        else checksPorDia[dataStr].push(idRotina);
+        localStorage.setItem('catPlanRotinasChecks', JSON.stringify(checksPorDia));
+        carregarTudo(dataStr); 
+        sincronizarComNuvem();
+    }
+
+    window.excluirRotina = function(idRotina) {
+        if(confirm("Apagar este item da rotina permanentemente?")) {
+            let rotinas = JSON.parse(localStorage.getItem('catPlanRotinasGlobal')) || [];
+            rotinas = rotinas.filter(r => r.id !== idRotina);
+            localStorage.setItem('catPlanRotinasGlobal', JSON.stringify(rotinas));
+            carregarTudo(displayData.innerText);
+            sincronizarComNuvem();
+        }
+    }
+
+    // Ao marcar como concluído, a tarefa SUMIRÁ da tela!
+    window.toggleTarefaDiaria = function(idTarefa, dataStr) {
         let todasTarefas = JSON.parse(localStorage.getItem('catPlanTarefasDiarias')) || {};
-        let tarefasHoje = todasTarefas[dataStr] || [];
-        const index = tarefasHoje.findIndex(t => t.id === idTarefa);
+        if (todasTarefas[dataStr]) {
+            const index = todasTarefas[dataStr].findIndex(t => t.id === idTarefa);
+            if (index !== -1) {
+                todasTarefas[dataStr][index].concluida = true;
+                localStorage.setItem('catPlanTarefasDiarias', JSON.stringify(todasTarefas));
+                carregarTudo(displayData.innerText);
+                sincronizarComNuvem();
+            }
+        }
+    }
+
+    // Ao marcar como concluído, o compromisso SUMIRÁ da tela!
+    window.toggleCompromissoDashboard = function(idComp, dataStr) {
+        let todosCompromissos = JSON.parse(localStorage.getItem('catPlanCompromissos')) || [];
+        const index = todosCompromissos.findIndex(c => c.id === idComp);
         if (index !== -1) {
-            tarefasHoje[index].concluida = !tarefasHoje[index].concluida;
-            todasTarefas[dataStr] = tarefasHoje;
-            localStorage.setItem('catPlanTarefasDiarias', JSON.stringify(todasTarefas));
-            carregarTarefas(dataStr);
+            todosCompromissos[index].concluido = true;
+            localStorage.setItem('catPlanCompromissos', JSON.stringify(todosCompromissos));
+            carregarTudo(displayData.innerText);
             sincronizarComNuvem();
         }
     }
 
     window.excluirTarefa = function(idTarefa, dataStr) {
         let todasTarefas = JSON.parse(localStorage.getItem('catPlanTarefasDiarias')) || {};
-        let tarefasHoje = todasTarefas[dataStr] || [];
-        tarefasHoje = tarefasHoje.filter(t => t.id !== idTarefa);
-        todasTarefas[dataStr] = tarefasHoje;
-        localStorage.setItem('catPlanTarefasDiarias', JSON.stringify(todasTarefas));
-        carregarTarefas(dataStr);
-        sincronizarComNuvem();
+        if (todasTarefas[dataStr]) {
+            todasTarefas[dataStr] = todasTarefas[dataStr].filter(t => t.id !== idTarefa);
+            localStorage.setItem('catPlanTarefasDiarias', JSON.stringify(todasTarefas));
+            carregarTudo(displayData.innerText);
+            sincronizarComNuvem();
+        }
     }
 
-    // Inicia a tela desenhando o dia atual!
+    // --- 5. LÓGICA DE ARRASTAR E SOLTAR (ZONAS DE DROP) ---
+    const zonasDeSoltura = [document.getElementById('areaEspera'), ...document.querySelectorAll('.day-card')];
+    
+    zonasDeSoltura.forEach(zona => {
+        if (!zona) return;
+        
+        zona.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            if (zona.id === 'areaEspera') zona.style.backgroundColor = '#d1b3ff'; // Roxo escuro
+            else zona.style.backgroundColor = 'rgba(0,0,0,0.05)';
+        });
+
+        zona.addEventListener('dragleave', () => {
+            if (zona.id === 'areaEspera') zona.style.backgroundColor = '#e5ccff'; // Roxo normal
+            else zona.style.backgroundColor = '';
+        });
+
+        zona.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (zona.id === 'areaEspera') zona.style.backgroundColor = '#e5ccff';
+            else zona.style.backgroundColor = '';
+            
+            const payload = JSON.parse(e.dataTransfer.getData('text/plain'));
+            const newDate = zona.id === 'areaEspera' ? '00/00/0000' : zona.getAttribute('data-data');
+            
+            // Tratamento dependendo do tipo da tarefa arrastada
+            if (payload.type === 'estudo') {
+                let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
+                const idx = tarefas.findIndex(t => t.id === payload.id);
+                if (idx !== -1) {
+                    tarefas[idx].data = newDate;
+                    localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
+                }
+            } 
+            else if (payload.type === 'diaria') {
+                let tarefasD = JSON.parse(localStorage.getItem('catPlanTarefasDiarias')) || {};
+                let arrOld = tarefasD[payload.oldDate] || [];
+                const idx = arrOld.findIndex(t => t.id === payload.id);
+                if (idx !== -1) {
+                    const task = arrOld.splice(idx, 1)[0];
+                    if (!tarefasD[newDate]) tarefasD[newDate] = [];
+                    tarefasD[newDate].push(task);
+                    localStorage.setItem('catPlanTarefasDiarias', JSON.stringify(tarefasD));
+                }
+            } 
+            else if (payload.type === 'compromisso') {
+                let compromissos = JSON.parse(localStorage.getItem('catPlanCompromissos')) || [];
+                const idx = compromissos.findIndex(c => c.id === payload.id);
+                if (idx !== -1) {
+                    compromissos[idx].data = newDate === '00/00/0000' ? "" : converterDDMMparaYYYYMM(newDate);
+                    localStorage.setItem('catPlanCompromissos', JSON.stringify(compromissos));
+                }
+            }
+            
+            carregarTudo(displayData.innerText);
+            sincronizarComNuvem();
+        });
+    });
+
+    // --- 6. BARRA DE PESQUISA DO PAINEL ROXO ---
+    if (inputPesquisa) {
+        inputPesquisa.addEventListener('input', filtrarPainelRoxo);
+    }
+
+    function filtrarPainelRoxo() {
+        if (!inputPesquisa || !areaEspera) return;
+        const termo = inputPesquisa.value.toLowerCase();
+        const tarefasListadas = areaEspera.querySelectorAll('.tarefa-arrastavel');
+        
+        tarefasListadas.forEach(el => {
+            const desc = el.getAttribute('data-desc');
+            if (desc.includes(termo)) el.style.display = 'block';
+            else el.style.display = 'none';
+        });
+    }
+
+    // --- INITIALIZE ---
     atualizarTelaInteira();
 });
