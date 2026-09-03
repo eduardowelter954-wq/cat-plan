@@ -3,12 +3,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnNovoGasto = document.getElementById('btnNovoGasto');
     const containerGastos = document.getElementById('containerGastos');
     
-    // Puxa os gastos salvos no computador
     let gastos = JSON.parse(localStorage.getItem('catPlanGastos')) || [];
+
+    function resolverNome(input, lista) {
+        if (!input) return "";
+        input = input.trim();
+        const num = parseInt(input);
+        if (!isNaN(num) && num >= 1 && num <= lista.length) {
+            return lista[num - 1].nome || lista[num - 1].titulo;
+        }
+        return input;
+    }
 
     if (btnNovoGasto) {
         btnNovoGasto.addEventListener('click', () => {
-            const titulo = prompt("O que você comprou? (Ex: Queijo, Lanche no trabalho, Chocolate)");
+            const titulo = prompt("O que você comprou? (Ex: Queijo, Lanche, Chocolate)");
             if (!titulo) return;
 
             const valor = prompt(`Qual foi o valor gasto com '${titulo}'? (Ex: 15.50)`);
@@ -17,12 +26,35 @@ document.addEventListener("DOMContentLoaded", () => {
             const tipo = prompt("Tipo de gasto: (Necessário, Extra ou Alimentar)");
             if (!tipo) return;
 
-            const formaPagamento = prompt("Forma de pagamento: (Ex: Vale alimentação, Dinheiro físico, qual banco?)");
-            if (!formaPagamento) return;
+            // Puxa as contas cadastradas
+            const contasCadastradas = JSON.parse(localStorage.getItem('catPlanContasBancarias')) || [];
+            let textoContas = "Suas contas cadastradas:\n";
+            contasCadastradas.forEach((c, idx) => {
+                textoContas += `${idx + 1} - ${c.nome}\n`;
+            });
 
-            const foiParaMeta = prompt("Foi para a poupança ou alguma meta? (Responda 'Não' ou o nome da meta)");
+            const inputConta = prompt(textoContas + "\nDigite o NÚMERO ou o NOME da conta de origem (de onde sai o dinheiro):");
+            if (!inputConta) return;
+            const contaOrigemFinal = resolverNome(inputConta, contasCadastradas);
 
-            // Captura e formata a data de hoje automaticamente (DD/MM/AAAA)
+            // Puxa as metas cadastradas
+            const metasCadastradas = JSON.parse(localStorage.getItem('catPlanMetasDinheiro')) || [];
+            let textoMetas = "Suas metas cadastradas:\n0 - Nenhuma / Não\n";
+            metasCadastradas.forEach((m, idx) => {
+                textoMetas += `${idx + 1} - ${m.titulo}\n`;
+            });
+
+            const inputMeta = prompt(textoMetas + "\nDigite o número da meta correspondente ou 'Não':");
+            let metaFinal = "Não";
+            if (inputMeta && inputMeta.trim().toLowerCase() !== 'não' && inputMeta.trim() !== '0') {
+                const numMeta = parseInt(inputMeta);
+                if (!isNaN(numMeta) && numMeta >= 1 && numMeta <= metasCadastradas.length) {
+                    metaFinal = metasCadastradas[numMeta - 1].titulo;
+                } else {
+                    metaFinal = inputMeta.trim();
+                }
+            }
+
             const dataAtual = new Date();
             const dataFormatada = `${String(dataAtual.getDate()).padStart(2, '0')}/${String(dataAtual.getMonth() + 1).padStart(2, '0')}/${dataAtual.getFullYear()}`;
 
@@ -31,12 +63,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 titulo: titulo.trim(),
                 valor: parseFloat(valor.replace(',', '.')) || 0,
                 tipo: tipo.trim().toLowerCase(),
-                forma: formaPagamento.trim(),
-                meta: foiParaMeta ? foiParaMeta.trim() : "Não",
+                conta: contaOrigemFinal, // Nome exato da conta para o saldo abater!
+                meta: metaFinal,
                 data: dataFormatada
             };
 
-            gastos.push(novoGasto);
+            gastos.unshift(novoGasto);
             salvarERenderizarGastos();
         });
     }
@@ -48,26 +80,24 @@ document.addEventListener("DOMContentLoaded", () => {
         gastos.forEach(gasto => {
             const divGasto = document.createElement('div');
             divGasto.className = 'card-gasto';
+            divGasto.style.position = 'relative';
             
-            // Só exibe a linha de meta/poupança se você tiver digitado algo diferente de "Não"
             const linhaMeta = (gasto.meta.toLowerCase() !== 'não' && gasto.meta !== '') 
                 ? `<div class="gasto-linha">Foi para meta/poupança: <span>${gasto.meta}</span></div>` 
                 : '';
 
             divGasto.innerHTML = `
-                <!-- Botão de check para excluir/concluir o registro -->
                 <img src="icone-check.png" class="delete-gasto-btn" data-id="${gasto.id}" style="position: absolute; top: 15px; right: 15px; width: 24px; cursor: pointer;" title="Apagar registro">
                 
                 <div class="gasto-titulo">${gasto.titulo} - R$ ${gasto.valor.toFixed(2)}</div>
                 <div class="gasto-linha">Tipo de gasto: <span>${gasto.tipo}</span></div>
-                <div class="gasto-linha">Forma de pagamento: <span>${gasto.forma}</span></div>
+                <div class="gasto-linha">Conta de origem: <span>${gasto.conta || 'Não informada'}</span></div>
                 ${linhaMeta}
                 <div class="gasto-linha">Data: <span>${gasto.data}</span></div>
             `;
             containerGastos.appendChild(divGasto);
         });
 
-        // Funcionalidade para apagar o cartão ao clicar no check
         document.querySelectorAll('.delete-gasto-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = parseInt(e.target.getAttribute('data-id'));
