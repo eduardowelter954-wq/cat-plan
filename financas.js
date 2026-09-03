@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnEditVermelho = document.getElementById('btnEditVermelho');
     if (btnEditVermelho) {
         btnEditVermelho.addEventListener('click', () => {
-            let novoVermelho = prompt("A partir de qual porcentagem os gastos estão ruins (VERMELHO)?", config.vermelhoMin);
+            let novoVermelho = prompt(" partir de qual porcentagem os seus gastos extrapolaram (VERMELHO)?", config.vermelhoMin);
             novoVermelho = parseInt(novoVermelho);
             
             if (!isNaN(novoVermelho) && novoVermelho > parseInt(config.verdeMax) + 1 && novoVermelho <= 100) {
