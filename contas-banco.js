@@ -74,21 +74,30 @@ function salvarERenderizarContas() {
         localStorage.setItem('catPlanContasBancarias', JSON.stringify(contas));
         listaCadastrados.innerHTML = '';
 
-        // Puxa movimentações e gastos para calcular o saldo de cada conta
         const movimentacoes = JSON.parse(localStorage.getItem('catPlanMovimentacoes')) || [];
         const gastos = JSON.parse(localStorage.getItem('catPlanGastos')) || [];
 
         contas.forEach(conta => {
-            // Calcula o saldo atual da conta
             let saldo = 0;
 
+            // Soma e subtrai com base nas movimentações financeiras
             movimentacoes.forEach(m => {
-                if (m.contaOrigem === conta.nome) saldo -= m.valor;
-                if (m.contaDestino === conta.nome || (m.tipo.includes('Entrada') && m.conta === conta.nome)) saldo += m.valor;
+                const origem = m.contaOrigem;
+                const destino = m.contaDestino || m.conta;
+
+                if (origem === conta.nome) {
+                    saldo -= m.valor;
+                }
+                if (destino === conta.nome) {
+                    saldo += m.valor;
+                }
             });
 
+            // Subtrai os gastos vinculados a esta conta
             gastos.forEach(g => {
-                if (g.conta === conta.nome) saldo -= g.valor;
+                if (g.conta === conta.nome) {
+                    saldo -= g.valor;
+                }
             });
 
             const li = document.createElement('div');
@@ -119,6 +128,5 @@ function salvarERenderizarContas() {
             });
         });
     }
-
     salvarERenderizarContas();
 });
