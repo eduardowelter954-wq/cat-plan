@@ -19,12 +19,12 @@
         </nav>
 
         <!-- NOVO LAYOUT: Calendário na Esquerda e Tarefas na Direita -->
-        <div style="display: flex; gap: 20px; flex-grow: 1; padding: 20px;">
+        <div style="display: flex; gap: 30px; flex-grow: 1; padding: 20px; align-items: flex-start;">
             
             <!-- Calendário de Estudos (Esquerda) -->
-            <section class="calendario-estudos" style="flex-grow: 1;">
+            <section class="calendario-estudos" style="flex-grow: 1; min-width: 500px;">
                 
-                <div class="date-navigation" style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 15px;">
+                <div class="date-navigation" style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 20px;">
                     <!-- Linha 1: Setas e Data (Mês/Ano) -->
                     <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
                         <button class="arrow-btn" id="btnSemanaAnterior"><img src="seta-esquerda-azul.png" alt="Anterior"></button>
@@ -39,7 +39,7 @@
                     </div>
                 </div>
 
-                <!-- Grade dos dias da semana (Sexta, Sábado e Domingo mais compridos) -->
+                <!-- Grade dos dias da semana -->
                 <div class="week-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div class="day-card" id="dia-Segunda" data-diadasemana="Segunda">
                         <h4 id="head-Segunda">Segunda<br><span></span></h4>
@@ -59,15 +59,15 @@
                     </div>
                     
                     <!-- SEXTA, SÁBADO E DOMINGO OCUPANDO A LINHA INTEIRA -->
-                    <div class="day-card" id="dia-Sexta" data-diadasemana="Sexta" style="grid-column: 1 / span 2;">
+                    <div class="day-card" id="dia-Sexta" data-diadasemana="Sexta" style="grid-column: 1 / -1;">
                         <h4 id="head-Sexta">Sexta<br><span></span></h4>
                         <div class="tasks-container" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
                     </div>
-                    <div class="day-card" id="dia-Sábado" data-diadasemana="Sábado" style="grid-column: 1 / span 2;">
+                    <div class="day-card" id="dia-Sábado" data-diadasemana="Sábado" style="grid-column: 1 / -1;">
                         <h4 id="head-Sábado">Sábado<br><span></span></h4>
                         <div class="tasks-container" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
                     </div>
-                    <div class="day-card" id="dia-Domingo" data-diadasemana="Domingo" style="grid-column: 1 / span 2;">
+                    <div class="day-card" id="dia-Domingo" data-diadasemana="Domingo" style="grid-column: 1 / -1;">
                         <h4 id="head-Domingo">Domingo<br><span></span></h4>
                         <div class="tasks-container" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
                     </div>
@@ -75,19 +75,19 @@
             </section>
 
             <!-- Painel de Tarefas Sem Data (Direita do Calendário) -->
-            <section class="tarefas-sem-data" style="width: 350px; display: flex; flex-direction: column; gap: 10px;">
+            <section class="tarefas-sem-data" style="width: 350px; flex-shrink: 0; display: flex; flex-direction: column; gap: 15px;">
                 
                 <!-- Barra de Pesquisa -->
                 <div style="display: flex; width: 100%; border: 2px solid #4a90e2; border-radius: 8px; overflow: hidden; background: #fff;">
                     <input type="text" id="inputPesquisaTarefas" placeholder="Pesquisar descrição..." style="flex-grow: 1; padding: 10px; border: none; outline: none; font-size: 15px;">
-                    <button style="background-color: #4a90e2; border: none; padding: 10px 15px; cursor: default;">
+                    <div style="background-color: #4a90e2; padding: 10px 15px; display: flex; align-items: center; justify-content: center;">
                         <span style="color: white; font-weight: bold; font-size: 16px;">🔍</span>
-                    </button>
+                    </div>
                 </div>
 
-                <!-- Fundo Azul para Soltar e Guardar Tarefas -->
-                <div class="dropzone-azul" id="areaEspera" style="flex-grow: 1; background-color: #a3c4f3; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; gap: 10px; min-height: 500px; overflow-y: auto;">
-                    <p style="color: #333; font-weight: bold; text-align: center; margin-bottom: 10px; width: 100%;">Tarefas Sem Data</p>
+                <!-- Fundo Azul Limpo para Soltar e Guardar Tarefas -->
+                <div id="areaEspera" style="background-color: #a3c4f3; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; min-height: 600px; max-height: 800px; overflow-y: auto;">
+                    <h3 style="color: #000; font-size: 18px; text-align: center; margin-bottom: 10px; margin-top: 0;">Tarefas Sem Data</h3>
                     <!-- As tarefas entram aqui -->
                 </div>
             </section>
