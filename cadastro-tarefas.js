@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // --- 0. SUPER SINCRONIZAÇÃO COM A NUVEM (Segura e não bloqueante) ---
+    // --- 0. SUPER SINCRONIZAÇÃO COM A NUVEM ---
     async function sincronizarComNuvem() {
         const username = localStorage.getItem('usuarioLogado');
         if (!username) return; 
@@ -32,8 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-
-    // --- VARIÁVEIS E SELETORES DO FORMULÁRIO ---
+    // --- VARIÁVEIS DO FORMULÁRIO ---
     const bolasPrioridade = document.querySelectorAll('.bola-prioridade');
     let prioridadeSelecionada = 'verde'; 
     const containerLista = document.getElementById('containerListaTarefas');
@@ -43,27 +42,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const inputData = document.getElementById('dataPassoInput');
     const btnSalvar = document.getElementById('btnSalvarPasso');
 
-    // Inicializa a tela carregando dados salvos
-    carregarTarefasNaTela();
-    desenharMaterias();
-
-    // --- SELEÇÃO DE PRIORIDADE BLINDADA ---
+    // --- SELEÇÃO DE PRIORIDADE ---
     bolasPrioridade.forEach(bola => {
         bola.addEventListener('click', (e) => {
-            // Remove o destaque de todas e coloca borda preta apenas na clicada
             bolasPrioridade.forEach(b => {
                 b.classList.remove('active');
                 b.style.border = "3px solid transparent";
             });
-            
             const elemento = e.currentTarget;
             elemento.classList.add('active');
-            elemento.style.border = "3px solid #000"; // Borda preta destacando a escolha
+            elemento.style.border = "3px solid #000"; 
             prioridadeSelecionada = elemento.getAttribute('data-cor');
         });
     });
 
-    // --- SALVAR NOVO PASSO / TAREFA ---
+    // --- SALVAR NOVO PASSO ---
     if (btnSalvar) {
         btnSalvar.addEventListener('click', () => {
             const materia = inputMateria.value.trim().toUpperCase(); 
@@ -72,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let data = inputData.value;
             
             if (materia === "" || tituloTarefa === "" || descricaoPasso === "") {
-                alert("Por favor, preencha a Matéria, o Título da Tarefa e a Descrição do Passo!");
+                alert("Por favor, preencha a Matéria, o Título da Tarefa e a Descrição!");
                 return;
             }
 
@@ -93,16 +86,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 concluida: false
             };
 
-            // Salva no LocalStorage
             let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
             tarefas.push(novoPasso);
             localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
 
-            // Atualiza a tela imediatamente
             carregarTarefasNaTela();
             sincronizarComNuvem(); 
             
-            // Limpa os campos de texto do passo (mantém matéria e título para facilitar digitação em lote)
             inputDesc.value = "";
             inputData.value = "";
         });
@@ -226,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- FUNÇÕES GLOBAIS DE PASSOS ---
+    // --- FUNÇÕES GLOBAIS DE EDIÇÃO ---
     window.marcarPassoFeito = function(idPasso) {
         let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
         const index = tarefas.findIndex(t => t.id === idPasso);
@@ -236,7 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
             carregarTarefasNaTela(); 
             sincronizarComNuvem(); 
         }
-    }
+    };
 
     window.editarPasso = function(idPasso) {
         let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
@@ -246,10 +236,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (novoTexto === null) return; 
 
             let dataAtual = tarefas[index].data === "00/00/0000" ? "" : tarefas[index].data;
-            const novaData = prompt("Edite a data do passo (Formato: DD/MM/AAAA) ou deixe em branco:", dataAtual);
+            const novaData = prompt("Edite a data (DD/MM/AAAA) ou deixe em branco:", dataAtual);
             if (novaData === null) return; 
 
-            const novaCor = prompt("Qual a prioridade deste passo? (Digite verde, laranja ou vermelha)", tarefas[index].prioridade || 'verde');
+            const novaCor = prompt("Prioridade? (verde, laranja ou vermelha)", tarefas[index].prioridade || 'verde');
             if (novaCor === null) return;
             const corLimpa = novaCor.trim().toLowerCase();
 
@@ -258,15 +248,13 @@ document.addEventListener("DOMContentLoaded", () => {
             
             if (['verde', 'laranja', 'vermelha'].includes(corLimpa)) {
                 tarefas[index].prioridade = corLimpa;
-            } else {
-                alert("Cor inválida. Mantendo a cor anterior!");
             }
 
             localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
             carregarTarefasNaTela(); 
             sincronizarComNuvem(); 
         }
-    });
+    }; // AQUI ESTAVA O ERRO NO CÓDIGO ANTERIOR!
 
     // ==========================================
     // --- LÓGICA DAS MATÉRIAS E LIXEIRA ---
@@ -277,7 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!nome || nome.trim() === "") return;
         
         const professor = prompt("Nome do(a) Professor(a):") || "";
-        const dias = prompt("Dias da aula (Ex: Segunda, Quarta, Sábado, Domingo ou 'Nenhum'):") || "Nenhum";
+        const dias = prompt("Dias da aula (Ex: Segunda, Quarta, Sábado, Domingo):") || "Nenhum";
 
         const novaMateria = {
             id: Date.now(),
@@ -294,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
         sincronizarComNuvem();
     };
 
-    window.desenharMaterias = function() {
+    function desenharMaterias() {
         const listaMateriasGrid = document.getElementById('listaMateriasGrid');
         if (!listaMateriasGrid) return;
         listaMateriasGrid.innerHTML = "";
@@ -336,7 +324,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const novoProf = prompt(`Editar professor(a):`, materias[index].professor || '');
             if (novoProf === null) return;
 
-            const novoDias = prompt(`Editar dias (Ex: Segunda, Sábado, Domingo ou 'Nenhum'):`, materias[index].dias || '');
+            const novoDias = prompt(`Editar dias:`, materias[index].dias || '');
             if (novoDias === null) return;
 
             materias[index].nome = novoNome.trim().toUpperCase() || materias[index].nome;
@@ -349,7 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- LIXEIRA DE MATÉRIAS ---
+    // --- LIXEIRA ---
     const btnLixeira = document.getElementById('btnLixeira');
     const btnConfirmar = document.getElementById('btnConfirmarExclusao');
     window.modoExclusaoGlobal = false;
@@ -406,3 +394,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         document.querySelectorAll('.materia-item-grid').forEach(m => m.style.backgroundColor = '#fff');
     }
+
+    // Chamadas iniciais
+    carregarTarefasNaTela();
+    desenharMaterias();
+
+});
