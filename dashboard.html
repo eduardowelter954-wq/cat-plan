@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
-    <div class="dashboard-container">
+    <div class="dashboard-container" style="max-width: 1500px;">
         
-        <!-- Menu Lateral -->
+        <!-- COLUNA 1: Menu Lateral -->
         <nav class="sidebar">
             <button class="menu-btn active tarefas">Tarefas</button>
             <button class="menu-btn estudos" onclick="window.location.href='estudos.html'">Estudos</button>
@@ -18,97 +18,122 @@
             <button class="menu-btn hobby">Hobby</button>
         </nav>
 
-        <!-- Painel de Cartões -->
-        <section class="cards-section">
-            
-            <!-- Cartão 1: Rotina -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>Rotina</h3>
-                    <!-- Botão de editar rotina (Lápis) -->
-                    <img src="icone-editar.png" alt="Editar" class="icon-edit" id="btnEditarRotina" title="Ativar modo edição" style="cursor: pointer;">
-                </div>
-                
-                <!-- Lista dinâmica de Rotinas -->
-                <ul class="task-list" id="listaRotina"></ul>
-                
-                <!-- Campo para adicionar nova rotina -->
-                <div class="input-area">
-                    <textarea id="novaRotinaInput" placeholder="Ex: Turno no suporte técnico"></textarea>
-                </div>
-                
-                <div class="card-footer">
-                    <img src="icone-adicionar.png" alt="Adicionar" class="icon-add" id="btnAdicionarRotina" style="cursor: pointer;">
-                </div>
-            </div>
+        <!-- LAYOUT PRINCIPAL (3 COLUNAS) -->
+        <div style="display: flex; gap: 20px; flex-grow: 1; padding: 20px; align-items: flex-start;">
 
-            <!-- Cartão 2: Tarefa para o dia -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>Tarefa para o dia</h3>
-                </div>
+            <!-- COLUNA 2: Visão do Dia (Data, Rotina e Tarefas Diárias) -->
+            <section class="daily-section" style="width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 15px;">
                 
-                <!-- Lista onde as tarefas dinâmicas vão aparecer -->
-                <ul class="task-list" id="listaTarefasHoje"></ul>
-                
-                <!-- O campo para digitar a nova tarefa -->
-                <div class="input-area">
-                    <textarea id="novaTarefaInput" placeholder="Exemplo."></textarea>
+                <!-- Navegação de Data -->
+                <div class="date-navigation" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+                        <button class="arrow-btn" id="btnDiaAnterior"><img src="seta-esquerda.png" alt="Anterior"></button>
+                        <h2 id="currentDate" style="margin: 0; font-size: 18px;">22/08/2026</h2>
+                        <button class="arrow-btn" id="btnDiaSeguinte"><img src="seta-direita.png" alt="Próximo"></button>
+                    </div>
+                    <div style="position: relative; width: 30px; height: 30px;">
+                        <img src="icone-calendario.png" alt="Calendário" class="calendar-icon" style="width: 100%; height: 100%; object-fit: contain;">
+                        <input type="date" id="calendarioPicker" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
+                    </div>
                 </div>
-                
-                <div class="card-footer">
-                    <img src="icone-adicionar.png" alt="Adicionar" class="icon-add" id="btnAdicionarTarefa" style="cursor: pointer;">
-                </div>
-            </div>
-            
-        </section>
 
-        <!-- Navegação de Data e Checklists -->
-        <section class="main-content">
-            
-<div class="date-navigation" style="display: flex; flex-direction: column !important; align-items: center !important; gap: 10px !important;">
-                
-                <!-- Linha 1: Setas e Data -->
-                <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
-                    <button class="arrow-btn" id="btnDiaAnterior"><img src="seta-esquerda.png" alt="Anterior"></button>
-                    <h2 id="currentDate" style="margin: 0;">22/08/2026</h2>
-                    <button class="arrow-btn" id="btnDiaSeguinte"><img src="seta-direita.png" alt="Próximo"></button>
+                <!-- Cartão 1: Rotina -->
+                <div class="card" style="box-shadow: 0px 4px 15px rgba(0,0,0,0.1);">
+                    <div class="card-header">
+                        <h3>Rotina</h3>
+                        <img src="icone-editar.png" alt="Editar" class="icon-edit" id="btnEditarRotina" title="Ativar modo edição" style="cursor: pointer;">
+                    </div>
+                    <ul class="task-list" id="listaRotina"></ul>
+                    <div class="input-area">
+                        <textarea id="novaRotinaInput" placeholder="Ex: Turno no suporte técnico"></textarea>
+                    </div>
+                    <div class="card-footer">
+                        <img src="icone-adicionar.png" alt="Adicionar" class="icon-add" id="btnAdicionarRotina" style="cursor: pointer;">
+                    </div>
                 </div>
-                
-                <!-- Linha 2: Ícone do Calendário Centralizado Embaixo -->
-                <div style="position: relative; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center;">
-                    <img src="icone-calendario.png" alt="Calendário" class="calendar-icon" style="width: 100%; height: 100%; object-fit: contain;">
-                    <!-- Input invisível clicável -->
-                    <input type="date" id="calendarioPicker" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
+
+                <!-- Cartão 2: Tarefa para o dia -->
+                <div class="card" style="box-shadow: 0px 4px 15px rgba(0,0,0,0.1);">
+                    <div class="card-header">
+                        <h3>Tarefa para o dia</h3>
+                    </div>
+                    <ul class="task-list" id="listaTarefasHoje"></ul>
+                    <div class="input-area">
+                        <textarea id="novaTarefaInput" placeholder="Adicionar nova tarefa para este dia..."></textarea>
+                    </div>
+                    <div class="card-footer">
+                        <img src="icone-adicionar.png" alt="Adicionar" class="icon-add" id="btnAdicionarTarefa" style="cursor: pointer;">
+                    </div>
                 </div>
-                
-            </div>
+            </section>
 
-            <!-- Legenda visual e Filtros -->
-            <div class="checklist" style="display: flex; justify-content: center; gap: 20px; margin-top: 15px;">
-                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                    <input type="checkbox" id="filtroRotina" checked> ROTINA
-                </label>
-                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                    <input type="checkbox" id="filtroCompromisso" checked> COMPROMISSO
-                </label>
-            </div>
-            
-        </section>
+            <!-- COLUNA 3: Calendário da Semana -->
+            <section class="calendario-estudos" style="flex-grow: 1; min-width: 450px;">
+                <div class="week-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="day-card" id="dia-Segunda" data-diadasemana="Segunda">
+                        <h4 id="head-Segunda">Segunda<br><span></span></h4>
+                        <div class="tasks-container"></div>
+                    </div>
+                    <div class="day-card" id="dia-Terça" data-diadasemana="Terça">
+                        <h4 id="head-Terça">Terça<br><span></span></h4>
+                        <div class="tasks-container"></div>
+                    </div>
+                    <div class="day-card" id="dia-Quarta" data-diadasemana="Quarta">
+                        <h4 id="head-Quarta">Quarta<br><span></span></h4>
+                        <div class="tasks-container"></div>
+                    </div>
+                    <div class="day-card" id="dia-Quinta" data-diadasemana="Quinta">
+                        <h4 id="head-Quinta">Quinta<br><span></span></h4>
+                        <div class="tasks-container"></div>
+                    </div>
+                    
+                    <!-- Finais de semana esticados -->
+                    <div class="day-card" id="dia-Sexta" data-diadasemana="Sexta" style="grid-column: 1 / -1;">
+                        <h4 id="head-Sexta">Sexta<br><span></span></h4>
+                        <div class="tasks-container" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                    </div>
+                    <div class="day-card" id="dia-Sábado" data-diadasemana="Sábado" style="grid-column: 1 / -1;">
+                        <h4 id="head-Sábado">Sábado<br><span></span></h4>
+                        <div class="tasks-container" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                    </div>
+                    <div class="day-card" id="dia-Domingo" data-diadasemana="Domingo" style="grid-column: 1 / -1;">
+                        <h4 id="head-Domingo">Domingo<br><span></span></h4>
+                        <div class="tasks-container" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                    </div>
+                </div>
+            </section>
 
-        <!-- Botões Superiores Direitos e Mascote -->
+            <!-- COLUNA 4: Tarefas Sem Data (Painel Roxo) -->
+            <section class="tarefas-sem-data" style="width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 15px;">
+                <!-- Barra de Pesquisa Roxa -->
+                <div style="display: flex; width: 100%; border: 2px solid #b388ff; border-radius: 8px; overflow: hidden; background: #fff;">
+                    <input type="text" id="inputPesquisaDashboard" placeholder="Pesquisar tarefas soltas..." style="flex-grow: 1; padding: 10px; border: none; outline: none; font-size: 15px;">
+                    <div style="background-color: #b388ff; padding: 10px 15px; display: flex; align-items: center; justify-content: center;">
+                        <span style="color: white; font-weight: bold; font-size: 16px;">🔍</span>
+                    </div>
+                </div>
+
+                <!-- Área de Espera Roxa -->
+                <div id="areaEspera" style="background-color: #e5ccff; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; min-height: 600px; max-height: 800px; overflow-y: auto;">
+                    <h3 style="color: #4a148c; font-size: 16px; text-align: center; margin-bottom: 10px; margin-top: 0;">Tarefas e Compromissos Sem Data</h3>
+                    <!-- As tarefas entram aqui -->
+                </div>
+            </section>
+
+        </div>
+
+        <!-- COLUNA 5: Painel Direito -->
         <aside class="right-panel">
             <div class="top-buttons">
-                <button class="action-btn active-page">Tarefas diárias e rotina</button>
+                <button class="action-btn active-page" style="background-color: #e5ccff; border-color: #b388ff;">Tarefas diárias e rotina</button>
                 <button class="action-btn" onclick="window.location.href='compromissos.html'">Compromissos</button>
             </div>
             
-            <img src="gato-lendo.png" alt="Gato lendo" class="mascot-reading">
+            <img src="gato-lendo.png" alt="Gato lendo" class="mascot-reading" style="margin-top: auto;">
         </aside>
 
     </div>
     
-    <!-- Link para a lógica principal -->
     <script src="dashboard.js"></script>
 </body>
 </html>
