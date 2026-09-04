@@ -35,7 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
         metas.forEach(meta => {
             const divMeta = document.createElement('div');
             divMeta.className = 'card-meta';
+            // Trava de segurança para o conteúdo não vazar das bordas arredondadas
             divMeta.style.position = 'relative';
+            divMeta.style.overflow = 'hidden';
 
             // Soma todos os gastos que possuem o nome exato desta meta
             let valorAtual = 0;
@@ -50,9 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
             divMeta.innerHTML = `
                 <img src="lixo.png" class="delete-meta-btn" data-id="${meta.id}" style="position: absolute; top: 12px; right: 12px; width: 18px; cursor: pointer; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'" title="Apagar meta">
                 
-                <div class="meta-titulo">${meta.titulo}</div>
-                <div style="font-size: 16px; font-weight: bold; margin: 6px 0;">${valorAtual.toFixed(0)} / ${meta.alvo.toFixed(0)}</div>
-                <div style="font-size: 11px; color: #444;">FALTA: ${falta.toFixed(0)}</div>
+                <div class="meta-titulo" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">${meta.titulo}</div>
+                <div style="font-size: 16px; font-weight: bold; margin: 6px 0; white-space: nowrap;">${valorAtual.toFixed(0)} / ${meta.alvo.toFixed(0)}</div>
+                <div style="font-size: 11px; color: #555; white-space: nowrap;">FALTA: ${falta.toFixed(0)}</div>
             `;
             containerMetas.appendChild(divMeta);
         });
