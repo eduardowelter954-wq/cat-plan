@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat-Plan - Organização</title>
+    <link rel="stylesheet" href="dashboard.css?v=3">
+</head>
+<body>
+    <div class="dashboard-container" style="max-width: 1400px;">
+        
+        <!-- Menu Lateral (Organização ativo em amarelo) -->
+        <nav class="sidebar">
+            <button class="menu-btn tarefas" onclick="window.location.href='dashboard.html'">Tarefas</button>
+            <button class="menu-btn estudos" onclick="window.location.href='estudos.html'">Estudos</button>
+            <button class="menu-btn financas" onclick="window.location.href='financas.html'">Finanças</button>
+            <button class="menu-btn active organizacao" onclick="window.location.href='organizacao.html'">Organização</button>
+            <button class="menu-btn hobby" onclick="window.location.href='hobby.html'">Hobby</button>
+        </nav>
+
+        <!-- Área Central (Folha de Caderno com Furo Espiral) -->
+        <section style="flex-grow: 1; padding: 20px; display: flex; align-items: flex-start; justify-content: center;">
+            <div style="background-color: #fdfbf7; border-left: 2px solid #e0dcd0; width: 650px; min-height: 85vh; padding: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; border-radius: 4px;">
+                
+                <h2 style="text-align: center; font-size: 20px; letter-spacing: 2px; margin-bottom: 30px; font-weight: bold; color: #222;">DESCRIÇÃO</h2>
+
+                <!-- Container onde os textos e listas salvos vão aparecer -->
+                <div id="containerListasOrg" style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- O JS injeta o conteúdo aqui -->
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Painel Direito (Subguias e Ferramentas) -->
+        <aside class="right-panel" style="width: 300px; display: flex; flex-direction: column; gap: 30px; padding: 20px;">
+            <div class="top-buttons" style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="action-btn" style="background-color: #fff9c4; border: 2px dashed #fbc02d; font-weight: bold;" onclick="window.location.href='cadastro-organizacao.html'">Cadastro</button>
+                <button class="action-btn" style="background-color: #fff9c4; border: 2px dashed #fbc02d; font-weight: bold;" onclick="window.location.href='organizacao.html'">Exemplo de lista/registro</button>
+            </div>
+
+            <!-- Ferramentas de Formatação (Atalhos visuais) -->
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; text-align: right; padding-right: 15px;">
+                <a href="#" id="btnFerramentaNumerar" style="color: #1976d2; text-decoration: none;">Numerar</a>
+                <a href="#" id="btnFerramentaNegrito" style="color: #1976d2; text-decoration: none;">Negrito</a>
+                <a href="#" id="btnFerramentaItalico" style="color: #1976d2; text-decoration: none;">Itálico</a>
+                <a href="#" id="btnFerramentaSublinhar" style="color: #1976d2; text-decoration: none;">Sublinhar</a>
+                <a href="#" id="btnFerramentaTopicos" style="color: #1976d2; text-decoration: none;">Colocar em tópicos</a>
+                <a href="#" id="btnFerramentaMaisculo" style="color: #1976d2; text-decoration: none;">Título (letras maiúsculas)</a>
+            </div>
+
+            <!-- Lixeira -->
+            <div style="text-align: center; margin-top: 10px;">
+                <img src="icone-lixeira.png" alt="Lixeira" id="btnExcluirTudoOrg" style="width: 45px; cursor: pointer; opacity: 0.8;" title="Limpar registros">
+            </div>
+            
+            <img src="gato-lendo.png" alt="Mascote Gato" style="width: 120px; align-self: flex-end; margin-top: auto;">
+        </aside>
+
+    </div>
+
+    <script src="organizacao.js"></script>
+</body>
+</html>
