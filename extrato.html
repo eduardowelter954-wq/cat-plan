@@ -11,17 +11,17 @@
         
         <!-- Menu Lateral -->
         <nav class="sidebar">
-            <button class="menu-btn tarefas" onclick="window.location.href='dashboard.html'">Tarefas</button>
-            <button class="menu-btn estudos" onclick="window.location.href='estudos.html'">Estudos</button>
-            <button class="menu-btn active financas" onclick="window.location.href='financas.html'">Finanças</button>
-            <button class="menu-btn organizacao">Organização</button>
+            <button class="menu-btn tarefas" onclick="window.location.href='dashboard.html'">Agenda</button>
+            <button class="menu-btn active estudos" onclick="window.location.href='estudos.html'">Tarefas</button>
+            <button class="menu-btn financas" onclick="window.location.href='financas.html'">Financeiro</button> 
+            <button class="menu-btn organizacao">Anotações</button>
             <button class="menu-btn hobby">Hobby</button>
         </nav>
 
         <!-- Área Central (Extrato Geral) -->
         <section style="flex-grow: 1; padding: 20px 40px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; max-height: 90vh;">
             
-            <h2 style="font-size: 24px; margin-bottom: 10px; color: #333;">Extrato Geral</h2>
+            <h2 style="font-size: 24px; margin-bottom: 10px; color: #333;">Histórico</h2>
 
             <!-- Container onde os cartões vão aparecer -->
             <div id="containerExtrato" style="display: flex; flex-direction: column; gap: 25px;">
@@ -33,14 +33,13 @@
         <!-- Painel Direito (Subguias) -->
         <aside class="right-panel" style="width: 280px; padding: 20px;">
             <div class="top-buttons">
-                <button class="action-btn action-btn-verde" onclick="window.location.href='financas.html'">Registro</button>
-                <button class="action-btn action-btn-verde" onclick="window.location.href='metas-dinheiro.html'">Metas de dinheiro</button>
+                <button class="action-btn action-btn-verde" onclick="window.location.href='financas.html'">Controle de Gasto</button>
+                <button class="action-btn action-btn-verde" onclick="window.location.href='metas-dinheiro.html'">Poupança e Metas</button>
                 <button class="action-btn action-btn-verde" onclick="window.location.href='gastos.html'">Gastos</button>
-                <button class="action-btn action-btn-verde" onclick="window.location.href='contas-fixas.html'">Contas fixas</button>
-                <button class="action-btn action-btn-verde" onclick="window.location.href='contas-banco.html'">Cadastro de conta no banco e forma de pagamento</button>
-                <button class="action-btn action-btn-verde" onclick="window.location.href='entradas-transferencias.html'">Entrada e transferência de dinheiro</button>
-                <!-- Botão de Extrato ativado -->
-                <button class="action-btn action-btn-verde active-page" onclick="window.location.href='extrato.html'">Extrato bancário</button>
+                <button class="action-btn action-btn-verde" onclick="window.location.href='contas-fixas.html'">Contas Mensais</button>
+                <button class="action-btn action-btn-verde active-page" onclick="window.location.href='contas-banco.html'">Saldo</button>
+                <button class="action-btn action-btn-verde" onclick="window.location.href='entradas-transferencias.html'">Ganho / Movimentação de Dinheiro</button>
+                <button class="action-btn action-btn-verde" onclick="window.location.href='extrato.html'">Extrato Financeiro</button>
             </div>
             
             <img src="gato-preto.png" alt="Mascote Gato Preto" style="width: 120px; align-self: flex-end; margin-top: auto;">
