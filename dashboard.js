@@ -162,6 +162,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         div.style.cursor = "grab";
         div.style.fontSize = "13px";
         div.style.fontWeight = "bold";
+        div.style.width = "100%";
         div.setAttribute('data-desc', texto.toLowerCase());
         
         let conteudo = tag ? `<div style="font-size:10px; background:#e0e0e0; padding:2px 6px; border-radius:4px; display:inline-block; margin-bottom:4px;">${tag}</div><br>` : '';
@@ -203,16 +204,51 @@ document.addEventListener("DOMContentLoaded", async () => {
             listaRotina.appendChild(li);
         });
 
-        // 3.2. COMPROMISSOS & TAREFAS DIÁRIAS (No cartão esquerdo e na grade/painel roxo)
+        // 3.2. INJETAR ROTINA EM CADA DIA DO CALENDÁRIO DA SEMANA
+        const weekCards = document.querySelectorAll('.day-card');
+        weekCards.forEach(card => {
+            const dateAttr = card.getAttribute('data-data');
+            const containerDia = card.querySelector('.tasks-container');
+            if (!containerDia || !dateAttr) return;
+
+            const concluidasNesteDia = checksPorDia[dateAttr] || [];
+
+            rotinas.forEach(rotina => {
+                const isChecked = concluidasNesteDia.includes(rotina.id);
+                
+                const divRotina = document.createElement('div');
+                divRotina.style.backgroundColor = isChecked ? 'rgba(255,255,255,0.6)' : '#f3e5f5';
+                divRotina.style.border = "2px dashed #ab47bc";
+                divRotina.style.borderRadius = "8px";
+                divRotina.style.padding = "8px";
+                divRotina.style.marginBottom = "8px";
+                divRotina.style.fontSize = "13px";
+                divRotina.style.fontWeight = "bold";
+                divRotina.style.width = "100%";
+                divRotina.style.opacity = isChecked ? "0.6" : "1";
+
+                divRotina.innerHTML = `
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0; width: 100%;">
+                        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleRotina(${rotina.id}, '${dateAttr}')" style="cursor: pointer;">
+                        <div style="flex-grow: 1; text-decoration: ${isChecked ? 'line-through' : 'none'};">
+                            <span style="font-size:10px; background:#ab47bc; color: #fff; padding:2px 5px; border-radius:4px; margin-right: 6px;">ROTINA</span>
+                            ${rotina.texto}
+                        </div>
+                    </label>
+                `;
+                containerDia.appendChild(divRotina);
+            });
+        });
+
+        // 3.3. COMPROMISSOS & TAREFAS DIÁRIAS (No cartão esquerdo e na grade/painel roxo)
         let todosCompromissos = JSON.parse(localStorage.getItem('catPlanCompromissos')) || [];
         let todasTarefasDiarias = JSON.parse(localStorage.getItem('catPlanTarefasDiarias')) || {};
         let todasTarefasEstudos = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
 
-        // Preenche o Cartão Esquerdo "Tarefa para o dia"
         const dataCompFormat = converterDDMMparaYYYYMM(dataStr);
         let compromissosHoje = todosCompromissos.filter(c => c.data === dataCompFormat && !c.concluido);
         let tarefasDiariasHoje = todasTarefasDiarias[dataStr] || [];
-        tarefasDiariasHoje = tarefasDiariasHoje.filter(t => !t.concluida); // Ignora as concluídas (Elas somem!)
+        tarefasDiariasHoje = tarefasDiariasHoje.filter(t => !t.concluida); 
 
         compromissosHoje.forEach(comp => {
             const li = document.createElement('li');
@@ -220,7 +256,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             li.innerHTML = `
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1;">
                     <input type="checkbox" onchange="toggleCompromissoDashboard(${comp.id}, '${dataStr}')">
-                    <span><strong style="font-size: 11px; background: #e5ccff; color: #4a148c; padding: 2px 6px; border-radius: 4px; margin-right: 5px;">COMPROMISSO</strong> ${comp.descricao}</span>
+                    <span><strong style="font-size: 11px; background: #e1bee7; color: #4a148c; padding: 2px 6px; border-radius: 4px; margin-right: 5px;">COMPROMISSO</strong> ${comp.descricao}</span>
                 </label>
             `;
             listaTarefas.appendChild(li);
@@ -240,9 +276,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
 
-        // 3.3. DISTRIBUIR NA GRADE E NO PAINEL ROXO (Apenas itens não concluídos)
-        
-        // Tarefas de Estudos
+        // 3.4. DISTRIBUIR NA GRADE E NO PAINEL ROXO (Apenas itens não concluídos)
         todasTarefasEstudos.forEach(t => {
             if (t.concluida) return;
             let cor = '#fff';
@@ -260,7 +294,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
-        // Tarefas Diárias (Todas as datas)
         for (const [dataChave, arrTarefas] of Object.entries(todasTarefasDiarias)) {
             arrTarefas.forEach(t => {
                 if (t.concluida) return;
@@ -275,17 +308,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }
 
-        // Compromissos (Todas as datas)
         todosCompromissos.forEach(c => {
             if (c.concluido) return;
-            // Compromissos usam YYYY-MM-DD. Precisamos converter para a lógica do DD/MM/YYYY
             let dataPadrao = "00/00/0000";
             if (c.data && c.data !== "") {
                 const p = c.data.split('-');
                 dataPadrao = `${p[2]}/${p[1]}/${p[0]}`;
             }
             
-            const el = criarElementoArrastavel(c.id, 'compromisso', c.descricao, c.data, '#e5ccff', 'COMPROMISSO');
+            const el = criarElementoArrastavel(c.id, 'compromisso', c.descricao, c.data, '#e1bee7', 'COMPROMISSO');
             
             if (dataPadrao === "00/00/0000") {
                 if (areaEspera) areaEspera.appendChild(el);
@@ -297,7 +328,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         filtrarPainelRoxo();
     }
-
 
     // --- 4. FUNÇÕES DE STATUS (CONCLUIR / APAGAR) ---
     window.toggleRotina = function(idRotina, dataStr) {
@@ -321,7 +351,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // Ao marcar como concluído, a tarefa SUMIRÁ da tela!
     window.toggleTarefaDiaria = function(idTarefa, dataStr) {
         let todasTarefas = JSON.parse(localStorage.getItem('catPlanTarefasDiarias')) || {};
         if (todasTarefas[dataStr]) {
@@ -335,7 +364,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // Ao marcar como concluído, o compromisso SUMIRÁ da tela!
     window.toggleCompromissoDashboard = function(idComp, dataStr) {
         let todosCompromissos = JSON.parse(localStorage.getItem('catPlanCompromissos')) || [];
         const index = todosCompromissos.findIndex(c => c.id === idComp);
@@ -365,24 +393,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         zona.addEventListener('dragover', (e) => {
             e.preventDefault();
-            if (zona.id === 'areaEspera') zona.style.backgroundColor = '#d1b3ff'; // Roxo escuro
+            if (zona.id === 'areaEspera') zona.style.backgroundColor = '#d1b3ff'; 
             else zona.style.backgroundColor = 'rgba(0,0,0,0.05)';
         });
 
         zona.addEventListener('dragleave', () => {
-            if (zona.id === 'areaEspera') zona.style.backgroundColor = '#e5ccff'; // Roxo normal
+            if (zona.id === 'areaEspera') zona.style.backgroundColor = '#e1bee7'; 
             else zona.style.backgroundColor = '';
         });
 
         zona.addEventListener('drop', (e) => {
             e.preventDefault();
-            if (zona.id === 'areaEspera') zona.style.backgroundColor = '#e5ccff';
+            if (zona.id === 'areaEspera') zona.style.backgroundColor = '#e1bee7';
             else zona.style.backgroundColor = '';
             
-            const payload = JSON.parse(e.dataTransfer.getData('text/plain'));
+            const payloadData = e.dataTransfer.getData('text/plain');
+            if (!payloadData) return;
+            
+            const payload = JSON.parse(payloadData);
             const newDate = zona.id === 'areaEspera' ? '00/00/0000' : zona.getAttribute('data-data');
             
-            // Tratamento dependendo do tipo da tarefa arrastada
             if (payload.type === 'estudo') {
                 let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
                 const idx = tarefas.findIndex(t => t.id === payload.id);
