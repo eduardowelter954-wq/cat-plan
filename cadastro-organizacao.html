@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat-Plan - Cadastro de Organização</title>
+    <link rel="stylesheet" href="dashboard.css?v=3">
+</head>
+<body>
+    <div class="dashboard-container" style="max-width: 1400px;">
+        
+        <!-- Menu Lateral -->
+        <nav class="sidebar">
+            <button class="menu-btn tarefas" onclick="window.location.href='dashboard.html'">Tarefas</button>
+            <button class="menu-btn estudos" onclick="window.location.href='estudos.html'">Estudos</button>
+            <button class="menu-btn financas" onclick="window.location.href='financas.html'">Finanças</button>
+            <button class="menu-btn active organizacao" onclick="window.location.href='organizacao.html'">Organização</button>
+            <button class="menu-btn hobby" onclick="window.location.href='hobby.html'">Hobby</button>
+        </nav>
+
+        <!-- Área Central (Card de Cadastro Estilizado) -->
+        <section style="flex-grow: 1; padding: 40px; display: flex; justify-content: center; align-items: center;">
+            <div style="background-color: #fff; border: 3px solid #000; border-radius: 16px; padding: 30px; width: 450px; box-shadow: 4px 4px 0px rgba(0,0,0,0.15); position: relative;">
+                
+                <h3 style="text-align: center; margin-top: 0; margin-bottom: 25px; font-size: 18px;">Acrescentar lista/registro</h3>
+
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div>
+                        <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Descrição</label>
+                        <textarea id="inputDescricaoOrg" placeholder="Digite seu texto ou lista aqui..." style="width: 100%; height: 100px; padding: 10px; border: 2px solid #ccc; border-radius: 8px; font-family: inherit; resize: vertical;"></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 15px;">
+                        <div style="flex: 1;">
+                            <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Fonte:</label>
+                            <select id="selectFonteOrg" style="width: 100%; padding: 8px; border: 2px solid #ccc; border-radius: 6px;">
+                                <option value="Arial, sans-serif">Arial</option>
+                                <option value="'Courier New', monospace">Courier</option>
+                                <option value="Georgia, serif">Georgia</option>
+                                <option value="'Times New Roman', serif">Times New Roman</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Tamanho da letra:</label>
+                            <select id="selectTamanhoOrg" style="width: 100%; padding: 8px; border: 2px solid #ccc; border-radius: 6px;">
+                                <option value="14px">Pequena (14px)</option>
+                                <option value="16px" selected>Normal (16px)</option>
+                                <option value="20px">Grande (20px)</option>
+                                <option value="24px">Título (24px)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Botão de Check para Salvar -->
+                    <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                        <div id="btnSalvarOrg" style="background-color: #a5d6a7; border: 2px solid #000; border-radius: 50%; width: 45px; height: 45px; display: flex; justify-content: center; align-items: center; cursor: pointer;" title="Salvar Registro">
+                            <img src="icone-check.png" style="width: 22px; pointer-events: none;">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Painel Direito -->
+        <aside class="right-panel" style="width: 300px; padding: 20px;">
+            <div class="top-buttons" style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="action-btn" style="background-color: #fff9c4; border: 2px dashed #fbc02d; font-weight: bold;" onclick="window.location.href='cadastro-organizacao.html'">Cadastro de Adições</button>
+                <button class="action-btn" style="background-color: #fff9c4; border: 2px dashed #fbc02d; font-weight: bold;" onclick="window.location.href='organizacao.html'">Exemplo de lista/registro</button>
+            </div>
+            
+            <img src="gato-lendo.png" alt="Mascote Gato" style="width: 120px; align-self: flex-end; margin-top: auto;">
+        </aside>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const btnSalvar = document.getElementById('btnSalvarOrg');
+            const inputDescricao = document.getElementById('inputDescricaoOrg');
+            const selectFonte = document.getElementById('selectFonteOrg');
+            const selectTamanho = document.getElementById('selectTamanhoOrg');
+
+            btnSalvar.addEventListener('click', () => {
+                const desc = inputDescricao.value.trim();
+                if (!desc) {
+                    alert("Por favor, digite alguma descrição.");
+                    return;
+                }
+
+                let registros = JSON.parse(localStorage.getItem('catPlanOrganizacao')) || [];
+                
+                registros.push({
+                    id: Date.now(),
+                    descricao: desc,
+                    fonte: selectFonte.value,
+                    tamanho: selectTamanho.value
+                });
+
+                localStorage.setItem('catPlanOrganizacao', JSON.stringify(registros));
+                window.location.href = 'organizacao.html';
+            });
+        });
+    </script>
+</body>
+</html>
