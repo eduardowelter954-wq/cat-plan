@@ -34,19 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         metas.forEach(meta => {
             const divMeta = document.createElement('div');
-            
-            // Força a altura e largura corretas via JS para evitar qualquer conflito com o CSS antigo
-            divMeta.style.border = "3px solid #000";
-            divMeta.style.borderRadius = "14px";
-            divMeta.style.backgroundColor = "#c8e6c9";
-            divMeta.style.padding = "20px";
-            divMeta.style.width = "320px";
-            divMeta.style.minHeight = "130px";
+            // Restaura exclusivamente a classe original do CSS (garantindo a PNG/fundo correto)
+            divMeta.className = 'card-meta';
             divMeta.style.position = 'relative';
-            divMeta.style.boxShadow = "3px 3px 0px rgba(0,0,0,0.15)";
-            divMeta.style.display = "flex";
-            divMeta.style.flexDirection = "column";
-            divMeta.style.justifyContent = "space-between";
 
             // Soma todos os gastos que possuem o nome exato desta meta
             let valorAtual = 0;
@@ -61,9 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
             divMeta.innerHTML = `
                 <img src="lixo.png" class="delete-meta-btn" data-id="${meta.id}" style="position: absolute; top: 15px; right: 15px; width: 20px; cursor: pointer; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'" title="Apagar meta">
                 
-                <div style="font-weight: bold; font-size: 16px; color: #000; text-transform: uppercase; padding-right: 25px; margin-bottom: 8px;">${meta.titulo}</div>
-                <div style="font-size: 20px; font-weight: bold; color: #111; margin-bottom: 8px;">R$ ${valorAtual.toFixed(2)} / R$ ${meta.alvo.toFixed(2)}</div>
-                ${falta > 0 ? `<div style="font-size: 13px; font-weight: bold; color: #444;">FALTA: R$ ${falta.toFixed(2)}</div>` : `<div style="font-size: 13px; color: #2e7d32; font-weight: bold;">META ATINGIDA! 🎉</div>`}
+                <div class="meta-titulo">${meta.titulo}</div>
+                <div style="font-size: 18px; font-weight: bold; margin: 10px 0;">R$ ${valorAtual.toFixed(2)} / R$ ${meta.alvo.toFixed(2)}</div>
+                ${falta > 0 ? `<div style="font-size: 12px; color: #555;">FALTA: R$ ${falta.toFixed(2)}</div>` : `<div style="font-size: 12px; color: #2e7d32; font-weight: bold;">META ATINGIDA! 🎉</div>`}
             `;
             containerMetas.appendChild(divMeta);
         });
