@@ -1,34 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // --- LÓGICA DA POUPANÇA ---
-    const btnEditarPoupanca = document.getElementById('btnEditarPoupanca');
-    const textoPoupanca = document.getElementById('textoPoupanca');
-
-    let poupanca = JSON.parse(localStorage.getItem('catPlanPoupanca')) || { atual: 0, objetivo: 0 };
-
-    function atualizarTelaPoupanca() {
-        if (textoPoupanca) {
-            textoPoupanca.innerText = `${poupanca.atual} / ${poupanca.objetivo}`;
-        }
-    }
-
-    if (btnEditarPoupanca) {
-        btnEditarPoupanca.addEventListener('click', () => {
-            let novoAtual = prompt("Quanto você tem na poupança agora?", poupanca.atual);
-            if (novoAtual === null) return;
-            
-            let novoObjetivo = prompt("Qual é a sua meta total da poupança?", poupanca.objetivo);
-            if (novoObjetivo === null) return;
-
-            poupanca.atual = parseFloat(novoAtual) || 0;
-            poupanca.objetivo = parseFloat(novoObjetivo) || 0;
-            
-            localStorage.setItem('catPlanPoupanca', JSON.stringify(poupanca));
-            atualizarTelaPoupanca();
-        });
-    }
-
-    // --- LÓGICA DAS METAS ---
     const btnNovaMeta = document.getElementById('btnNovaMeta');
     const containerMetas = document.getElementById('containerMetas');
     
@@ -36,19 +7,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (btnNovaMeta) {
         btnNovaMeta.addEventListener('click', () => {
-            const titulo = prompt("Qual é o nome da nova meta? (Ex: PC Gamer, Viagem)");
+            const titulo = prompt("Qual o nome da meta ou poupança? (Ex: PC, Viagem, Reserva)");
             if (!titulo) return;
 
-            const valorMeta = prompt(`Qual é o valor total que você precisa para '${titulo}'?`);
-            if (!valorMeta) return;
-
-            const valorAtual = prompt(`Quanto você já tem guardado para '${titulo}'?`, "0");
+            const valorAlvo = prompt(`Qual o valor alvo/total para '${titulo}'? (Ex: 5000)`);
+            if (!valorAlvo) return;
 
             const novaMeta = {
                 id: Date.now(),
-                titulo: titulo.trim().toUpperCase(),
-                meta: parseFloat(valorMeta) || 0,
-                atual: parseFloat(valorAtual) || 0
+                titulo: titulo.trim(),
+                alvo: parseFloat(valorAlvo.replace(',', '.')) || 0,
+                concluida: false
             };
 
             metas.push(novaMeta);
@@ -60,39 +29,39 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem('catPlanMetasDinheiro', JSON.stringify(metas));
         containerMetas.innerHTML = '';
 
-        metas.forEach(meta => {
-            // A matemática para descobrir quanto falta:
-            let falta = meta.meta - meta.atual;
-            if (falta < 0) falta = 0; // Se passou da meta, falta 0!
+        // Puxa os gastos para somar quanto já foi depositado/gasto em cada meta
+        const gastos = JSON.parse(localStorage.getItem('catPlanGastos')) || [];
 
+        metas.forEach(meta => {
             const divMeta = document.createElement('div');
-            divMeta.className = 'card-dinheiro card-meta';
-            
+            divMeta.className = 'card-meta';
+            divMeta.style.position = 'relative';
+
+            // Soma todos os gastos que possuem o nome exato desta meta
+            let valorAtual = 0;
+            gastos.forEach(g => {
+                if (g.meta && g.meta.trim().toLowerCase() === meta.titulo.trim().toLowerCase()) {
+                    valorAtual += g.valor;
+                }
+            });
+
+            const falta = meta.alvo - valorAtual;
+
             divMeta.innerHTML = `
-                <!-- TOPO: Título da meta -->
-                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                    <span style="font-size: 18px; font-weight: bold; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${meta.titulo}</span>
-                </div>
+                <img src="lixo.png" class="delete-meta-btn" data-id="${meta.id}" style="position: absolute; top: 15px; right: 15px; width: 20px; cursor: pointer; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'" title="Apagar meta">
                 
-                <!-- MEIO: Valores (Atual / Meta) -->
-                <div style="font-size: 20px; font-weight: normal; width: 100%; text-align: left; margin: 10px 0;">
-                    ${meta.atual} / ${meta.meta}
-                </div>
-                
-                <!-- RODAPÉ: Falta e Botão de Concluir -->
-                <div style="display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; width: 100%;">
-                    <span style="font-size: 16px; white-space: nowrap;">FALTA: ${falta}</span>
-                    <img src="icone-check.png" class="check-meta-btn" data-id="${meta.id}" style="width: 24px; cursor: pointer;" title="Concluir">
-                </div>
+                <div class="meta-titulo" style="font-weight: bold; font-size: 16px; margin-bottom: 10px;">${meta.titulo}</div>
+                <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">${valorAtual.toFixed(2)} / ${meta.alvo.toFixed(2)}</div>
+                ${falta > 0 ? `<div style="font-size: 13px; color: #555;">FALTA: ${falta.toFixed(2)}</div>` : `<div style="font-size: 13px; color: #2e7d32; font-weight: bold;">META ATINGIDA! 🎉</div>`}
             `;
             containerMetas.appendChild(divMeta);
         });
 
-        // Adiciona funcionalidade apenas ao botão de concluir agora
-        document.querySelectorAll('.check-meta-btn').forEach(btn => {
+        // Evento para excluir meta
+        document.querySelectorAll('.delete-meta-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = parseInt(e.target.getAttribute('data-id'));
-                if (confirm("Você atingiu essa meta ou deseja apagá-la?")) {
+                if (confirm("Deseja apagar esta meta permanentemente?")) {
                     metas = metas.filter(m => m.id !== id);
                     salvarERenderizarMetas();
                 }
@@ -100,7 +69,5 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Inicializa a tela
-    atualizarTelaPoupanca();
     salvarERenderizarMetas();
 });
