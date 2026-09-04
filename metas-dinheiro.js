@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         metas.forEach(meta => {
             const divMeta = document.createElement('div');
-            // Restaura exclusivamente a classe original do CSS (garantindo a PNG/fundo correto)
             divMeta.className = 'card-meta';
             divMeta.style.position = 'relative';
 
@@ -49,11 +48,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const falta = meta.alvo - valorAtual;
 
             divMeta.innerHTML = `
-                <img src="lixo.png" class="delete-meta-btn" data-id="${meta.id}" style="position: absolute; top: 15px; right: 15px; width: 20px; cursor: pointer; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'" title="Apagar meta">
+                <img src="lixo.png" class="delete-meta-btn" data-id="${meta.id}" style="position: absolute; top: 12px; right: 12px; width: 18px; cursor: pointer; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'" title="Apagar meta">
                 
                 <div class="meta-titulo">${meta.titulo}</div>
-                <div style="font-size: 18px; font-weight: bold; margin: 10px 0;">R$ ${valorAtual.toFixed(2)} / R$ ${meta.alvo.toFixed(2)}</div>
-                ${falta > 0 ? `<div style="font-size: 12px; color: #555;">FALTA: R$ ${falta.toFixed(2)}</div>` : `<div style="font-size: 12px; color: #2e7d32; font-weight: bold;">META ATINGIDA! 🎉</div>`}
+                <div style="font-size: 16px; font-weight: bold; margin: 6px 0;">${valorAtual.toFixed(0)} / ${meta.alvo.toFixed(0)}</div>
+                <div style="font-size: 11px; color: #444;">FALTA: ${falta.toFixed(0)}</div>
             `;
             containerMetas.appendChild(divMeta);
         });
