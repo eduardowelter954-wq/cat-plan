@@ -29,11 +29,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             let tipoFinal = "";
             if (tipoEscolha.trim() === "1") {
-                tipoFinal = "necessário";
+                tipoFinal = "Necessário";
             } else if (tipoEscolha.trim() === "2") {
-                tipoFinal = "extra";
+                tipoFinal = "Extra";
             } else if (tipoEscolha.trim() === "3") {
-                tipoFinal = "alimentar";
+                tipoFinal = "Alimentar";
             } else if (tipoEscolha.trim() === "4") {
                 const tipoCustom = prompt("Digite o tipo de gasto:");
                 if (!tipoCustom || tipoCustom.trim() === "") return;
