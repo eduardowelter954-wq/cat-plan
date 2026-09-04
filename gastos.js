@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 textoMetas += `${idx + 1} - ${m.titulo}\n`;
             });
 
-            const inputMeta = prompt(textoMetas + "\nDigite o número da meta correspondente ou 'Não':");
+            const inputMeta = prompt(textoMetas + "\nDigite o número da meta correspondente:");
             let metaFinal = "Não";
             if (inputMeta && inputMeta.trim().toLowerCase() !== 'não' && inputMeta.trim() !== '0') {
                 const numMeta = parseInt(inputMeta);
