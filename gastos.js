@@ -23,8 +23,25 @@ document.addEventListener("DOMContentLoaded", () => {
             const valor = prompt(`Qual foi o valor gasto com '${titulo}'? (Ex: 15.50)`);
             if (!valor) return;
 
-            const tipo = prompt("Tipo de gasto: (Necessário, Extra ou Alimentar)");
-            if (!tipo) return;
+            // Novo menu de seleção do tipo de gasto
+            const tipoEscolha = prompt("Selecione o tipo de gasto:\n1 - Necessário\n2 - Extra\n3 - Alimentar\n4 - Outro (Digitar manualmente)");
+            if (!tipoEscolha) return;
+
+            let tipoFinal = "";
+            if (tipoEscolha.trim() === "1") {
+                tipoFinal = "necessário";
+            } else if (tipoEscolha.trim() === "2") {
+                tipoFinal = "extra";
+            } else if (tipoEscolha.trim() === "3") {
+                tipoFinal = "alimentar";
+            } else if (tipoEscolha.trim() === "4") {
+                const tipoCustom = prompt("Digite o tipo de gasto:");
+                if (!tipoCustom || tipoCustom.trim() === "") return;
+                tipoFinal = tipoCustom.trim().toLowerCase();
+            } else {
+                alert("Opção inválida. Operação cancelada.");
+                return;
+            }
 
             // Puxa as contas cadastradas
             const contasCadastradas = JSON.parse(localStorage.getItem('catPlanContasBancarias')) || [];
@@ -62,8 +79,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 id: Date.now(),
                 titulo: titulo.trim(),
                 valor: parseFloat(valor.replace(',', '.')) || 0,
-                tipo: tipo.trim().toLowerCase(),
-                conta: contaOrigemFinal, // Nome exato da conta para o saldo abater!
+                tipo: tipoFinal,
+                conta: contaOrigemFinal,
                 meta: metaFinal,
                 data: dataFormatada
             };
@@ -73,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-function salvarERenderizarGastos() {
+    function salvarERenderizarGastos() {
         localStorage.setItem('catPlanGastos', JSON.stringify(gastos));
         containerGastos.innerHTML = '';
 
@@ -87,7 +104,6 @@ function salvarERenderizarGastos() {
                 : '';
 
             divGasto.innerHTML = `
-                <!-- Ícone substituído para a lixeira padrão -->
                 <img src="lixo.png" class="delete-gasto-btn" data-id="${gasto.id}" style="position: absolute; top: 15px; right: 15px; width: 20px; cursor: pointer; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'" title="Apagar registro">
                 
                 <div class="gasto-titulo">${gasto.titulo} - R$ ${gasto.valor.toFixed(2)}</div>
