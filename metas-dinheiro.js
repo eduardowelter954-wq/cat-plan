@@ -54,6 +54,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function salvarERenderizarMetas() {
+        // Ordena as metas do menor valor total para o maior valor total
+        metas.sort((a, b) => a.meta - b.meta);
+
         localStorage.setItem('catPlanMetasDinheiro', JSON.stringify(metas));
         containerMetas.innerHTML = '';
 
@@ -61,7 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const gastos = JSON.parse(localStorage.getItem('catPlanGastos')) || [];
 
         metas.forEach(meta => {
-            // Soma todos os gastos vinculados a esta meta
             let valorAtual = 0;
             gastos.forEach(g => {
                 if (g.meta && g.meta.trim().toLowerCase() === meta.titulo.trim().toLowerCase()) {
@@ -69,9 +71,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
 
-            // A matemática para descobrir quanto falta:
             let falta = meta.meta - valorAtual;
-            if (falta < 0) falta = 0; // Se passou da meta, falta 0!
+            if (falta < 0) falta = 0;
 
             const divMeta = document.createElement('div');
             divMeta.className = 'card-dinheiro card-meta';
@@ -96,7 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
             containerMetas.appendChild(divMeta);
         });
 
-        // Adiciona funcionalidade ao botão de concluir / apagar
         document.querySelectorAll('.check-meta-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = parseInt(e.target.getAttribute('data-id'));
