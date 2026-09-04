@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function salvarERenderizarGastos() {
+function salvarERenderizarGastos() {
         localStorage.setItem('catPlanGastos', JSON.stringify(gastos));
         containerGastos.innerHTML = '';
 
@@ -87,7 +87,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 : '';
 
             divGasto.innerHTML = `
-                <img src="icone-check.png" class="delete-gasto-btn" data-id="${gasto.id}" style="position: absolute; top: 15px; right: 15px; width: 24px; cursor: pointer;" title="Apagar registro">
+                <!-- Ícone substituído para a lixeira padrão -->
+                <img src="lixo.png" class="delete-gasto-btn" data-id="${gasto.id}" style="position: absolute; top: 15px; right: 15px; width: 20px; cursor: pointer; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'" title="Apagar registro">
                 
                 <div class="gasto-titulo">${gasto.titulo} - R$ ${gasto.valor.toFixed(2)}</div>
                 <div class="gasto-linha">Tipo de gasto: <span>${gasto.tipo}</span></div>
