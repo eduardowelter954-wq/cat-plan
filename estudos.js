@@ -245,6 +245,41 @@ const zonasDeSoltura = [document.getElementById('areaEspera'), ...document.query
         }
     }
 
+    // --- 7. EFEITO ACORDEÃO (ABRIR/FECHAR) NOS DIAS DA SEMANA ---
+    document.querySelectorAll('.day-card').forEach(card => {
+        const header = card.querySelector('div[id^="head-"]');
+        const container = card.querySelector('.tasks-container');
+        
+        if (header && container) {
+            // Estiliza o cabeçalho para indicar que é clicável
+            header.style.cursor = "pointer";
+            header.title = "Clique para abrir ou fechar as tarefas";
+            
+            // DEIXA OS DIAS FECHADOS POR PADRÃO (Se preferir que iniciem abertos, apague a linha abaixo)
+            container.style.display = "none";
+            header.style.opacity = "0.7"; // Fica levemente transparente quando fechado
+            
+            // Evento de clique para abrir/fechar
+            header.addEventListener('click', () => {
+                if (container.style.display === "none") {
+                    container.style.display = "block"; // Abre
+                    header.style.opacity = "1";
+                } else {
+                    container.style.display = "none";  // Fecha
+                    header.style.opacity = "0.7";
+                }
+            });
+
+            // Opcional: Se arrastar e soltar uma tarefa num dia fechado, ele abre automaticamente!
+            card.addEventListener('drop', () => {
+                if (container.style.display === "none") {
+                    container.style.display = "block";
+                    header.style.opacity = "1";
+                }
+            });
+        }
+    });
+
     if (document.getElementById('mesAnoDisplay')) {
         atualizarCalendario();
     } else {
