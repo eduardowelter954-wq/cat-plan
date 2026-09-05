@@ -1155,18 +1155,24 @@ input[type="checkbox"].compromisso,
     min-height: auto !important;
 }
 
-/* --- ESTICAR AS FAIXAS DE TAREFAS SEM DATA (AZUL E ROXA) --- */
+/* --- ESTICAR DEFINITIVAMENTE AS FAIXAS DE TAREFAS SEM DATA --- */
 
-/* Permite que o calendário de estudos e a agenda estiquem por igual */
-.dashboard-container,
-.calendario-estudos {
+/* 1. Permite que o container principal ocupe toda a altura da tela */
+html, body, .dashboard-container {
+    height: 100%;
+}
+
+/* 2. Força a coluna central (onde ficam os dias) e a lateral a esticarem juntas */
+.dashboard-container {
+    display: flex;
     align-items: stretch !important;
 }
 
-/* Força exclusivamente a faixa lateral de "Tarefas Sem Data" a preencher 100% da altura */
+/* 3. Faz a caixa de "Tarefas Sem Data" (tanto a azul quanto a roxa) preencher 100% da altura da coluna */
 #areaEspera {
     display: flex !important;
     flex-direction: column;
-    flex-grow: 1;
-    height: 100%;
+    flex-grow: 1 !important;
+    height: 100% !important;
+    min-height: 100% !important;
 }
