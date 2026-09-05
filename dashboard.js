@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         div.className = 'tarefa-arrastavel';
         div.draggable = true;
         div.style.backgroundColor = corFundo;
-        div.style.color = corTexto; // Permite mudar a cor da fonte (útil para fundos escuros)
+        div.style.color = corTexto;
         div.style.border = "2px solid #000";
         div.style.borderRadius = "8px";
         div.style.padding = "10px";
@@ -241,7 +241,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         });
 
-        // 3.3. TAREFAS DIÁRIAS (No cartão esquerdo e na grade)
+        // 3.3. TAREFAS DIÁRIAS
         let todasTarefasDiarias = JSON.parse(localStorage.getItem('catPlanTarefasDiarias')) || {};
         let tarefasDiariasHoje = todasTarefasDiarias[dataStr] || [];
         tarefasDiariasHoje = tarefasDiariasHoje.filter(t => !t.concluida); 
@@ -291,7 +291,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
-        // 3.5. COMPROMISSOS COM A NOVA COR ROXA E TEXTO BRANCO
+        // 3.5. COMPROMISSOS COM A NOVA COR #4D4EDD
         let todosCompromissos = JSON.parse(localStorage.getItem('catPlanCompromissos')) || [];
         const dataCompFormat = converterDDMMparaYYYYMM(dataStr);
         let compromissosHoje = todosCompromissos.filter(c => c.data === dataCompFormat && !c.concluido);
@@ -302,7 +302,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             li.innerHTML = `
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1;">
                     <input type="checkbox" onchange="toggleCompromissoDashboard(${comp.id}, '${dataStr}')">
-                    <span><strong style="font-size: 11px; background: #4a148c; color: #fff; padding: 2px 6px; border-radius: 4px; margin-right: 5px;">COMPROMISSO</strong> ${comp.descricao}</span>
+                    <span><strong style="font-size: 11px; background: #4D4EDD; color: #fff; padding: 2px 6px; border-radius: 4px; margin-right: 5px;">COMPROMISSO</strong> ${comp.descricao}</span>
                 </label>
             `;
             listaTarefas.appendChild(li);
@@ -316,8 +316,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 dataPadrao = `${p[2]}/${p[1]}/${p[0]}`;
             }
             
-            // Alterado: Fundo roxo escuro (#4a148c) e texto branco (#fff) para total contraste
-            const el = criarElementoArrastavel(c.id, 'compromisso', c.descricao, c.data, '#4a148c', 'COMPROMISSO', '#fff');
+            // Alterado: Fundo #4D4EDD e texto branco
+            const el = criarElementoArrastavel(c.id, 'compromisso', c.descricao, c.data, '#4D4EDD', 'COMPROMISSO', '#fff');
             
             if (dataPadrao === "00/00/0000") {
                 if (areaEspera) areaEspera.appendChild(el);
