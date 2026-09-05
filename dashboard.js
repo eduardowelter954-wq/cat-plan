@@ -150,11 +150,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     inputRotina.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); btnAddRotina.click(); } });
 
     // --- 3. MOTOR DE RENDERIZAÇÃO GERAL E ARRASTAR/SOLTAR ---
-    function criarElementoArrastavel(id, tipo, texto, dataAntiga, corFundo = '#fff', tag = '') {
+    function criarElementoArrastavel(id, tipo, texto, dataAntiga, corFundo = '#fff', tag = '', corTexto = '#000') {
         const div = document.createElement('div');
         div.className = 'tarefa-arrastavel';
         div.draggable = true;
         div.style.backgroundColor = corFundo;
+        div.style.color = corTexto; // Permite mudar a cor da fonte (útil para fundos escuros)
         div.style.border = "2px solid #000";
         div.style.borderRadius = "8px";
         div.style.padding = "10px";
@@ -165,7 +166,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         div.style.width = "100%";
         div.setAttribute('data-desc', texto.toLowerCase());
         
-        let conteudo = tag ? `<div style="font-size:10px; background:#e0e0e0; padding:2px 6px; border-radius:4px; display:inline-block; margin-bottom:4px;">${tag}</div><br>` : '';
+        let tagBg = corTexto === '#fff' ? 'rgba(255,255,255,0.2)' : '#e0e0e0';
+        let conteudo = tag ? `<div style="font-size:10px; background:${tagBg}; padding:2px 6px; border-radius:4px; display:inline-block; margin-bottom:4px;">${tag}</div><br>` : '';
         conteudo += `<span>${texto}</span>`;
         div.innerHTML = conteudo;
 
@@ -179,13 +181,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function carregarTudo(dataStr) {
-        // Limpa todas as áreas
         listaRotina.innerHTML = "";
         listaTarefas.innerHTML = "";
         document.querySelectorAll('.tasks-container').forEach(c => c.innerHTML = "");
         if (areaEspera) areaEspera.innerHTML = `<h3 style="color: #4a148c; font-size: 16px; text-align: center; margin-bottom: 10px; margin-top: 0;">Tarefas e Compromissos Sem Data</h3>`;
 
-        // 3.1. ROTINAS (Fixas no cartão esquerdo)
+        // 3.1. ROTINAS
         let rotinas = JSON.parse(localStorage.getItem('catPlanRotinasGlobal')) || [];
         let checksPorDia = JSON.parse(localStorage.getItem('catPlanRotinasChecks')) || {};
         let concluidasHoje = checksPorDia[dataStr] || [];
@@ -204,7 +205,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             listaRotina.appendChild(li);
         });
 
-        // 3.2. INJETAR ROTINA EM CADA DIA DO CALENDÁRIO DA SEMANA
+        // 3.2. INJETAR ROTINA NOS DIAS DO CALENDÁRIO
         const weekCards = document.querySelectorAll('.day-card');
         weekCards.forEach(card => {
             const dateAttr = card.getAttribute('data-data');
@@ -240,27 +241,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         });
 
-        // 3.3. COMPROMISSOS & TAREFAS DIÁRIAS (No cartão esquerdo e na grade/painel roxo)
-        let todosCompromissos = JSON.parse(localStorage.getItem('catPlanCompromissos')) || [];
+        // 3.3. TAREFAS DIÁRIAS (No cartão esquerdo e na grade)
         let todasTarefasDiarias = JSON.parse(localStorage.getItem('catPlanTarefasDiarias')) || {};
-        let todasTarefasEstudos = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
-
-        const dataCompFormat = converterDDMMparaYYYYMM(dataStr);
-        let compromissosHoje = todosCompromissos.filter(c => c.data === dataCompFormat && !c.concluido);
         let tarefasDiariasHoje = todasTarefasDiarias[dataStr] || [];
         tarefasDiariasHoje = tarefasDiariasHoje.filter(t => !t.concluida); 
-
-        compromissosHoje.forEach(comp => {
-            const li = document.createElement('li');
-            li.style.display = 'flex'; li.style.alignItems = 'center'; li.style.marginBottom = '8px';
-            li.innerHTML = `
-                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1;">
-                    <input type="checkbox" onchange="toggleCompromissoDashboard(${comp.id}, '${dataStr}')">
-                    <span><strong style="font-size: 11px; background: #e1bee7; color: #4a148c; padding: 2px 6px; border-radius: 4px; margin-right: 5px;">COMPROMISSO</strong> ${comp.descricao}</span>
-                </label>
-            `;
-            listaTarefas.appendChild(li);
-        });
 
         tarefasDiariasHoje.forEach(tarefa => {
             const li = document.createElement('li');
@@ -275,8 +259,21 @@ document.addEventListener("DOMContentLoaded", async () => {
             listaTarefas.appendChild(li);
         });
 
+        for (const [dataChave, arrTarefas] of Object.entries(todasTarefasDiarias)) {
+            arrTarefas.forEach(t => {
+                if (t.concluida) return;
+                const el = criarElementoArrastavel(t.id, 'diaria', t.texto, dataChave, '#f4f4f4', 'TAREFA GERAL');
+                if (dataChave === "00/00/0000" || dataChave === "ESPERA") {
+                    if (areaEspera) areaEspera.appendChild(el);
+                } else {
+                    const dayCard = document.querySelector(`.day-card[data-data="${dataChave}"] .tasks-container`);
+                    if (dayCard) dayCard.appendChild(el);
+                }
+            });
+        }
 
-        // 3.4. DISTRIBUIR NA GRADE E NO PAINEL ROXO (Apenas itens não concluídos)
+        // 3.4. TAREFAS DE ESTUDO
+        let todasTarefasEstudos = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
         todasTarefasEstudos.forEach(t => {
             if (t.concluida) return;
             let cor = '#fff';
@@ -294,19 +291,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
-        for (const [dataChave, arrTarefas] of Object.entries(todasTarefasDiarias)) {
-            arrTarefas.forEach(t => {
-                if (t.concluida) return;
-                const el = criarElementoArrastavel(t.id, 'diaria', t.texto, dataChave, '#f4f4f4', 'TAREFA GERAL');
-                
-                if (dataChave === "00/00/0000" || dataChave === "ESPERA") {
-                    if (areaEspera) areaEspera.appendChild(el);
-                } else {
-                    const dayCard = document.querySelector(`.day-card[data-data="${dataChave}"] .tasks-container`);
-                    if (dayCard) dayCard.appendChild(el);
-                }
-            });
-        }
+        // 3.5. COMPROMISSOS COM A NOVA COR ROXA E TEXTO BRANCO
+        let todosCompromissos = JSON.parse(localStorage.getItem('catPlanCompromissos')) || [];
+        const dataCompFormat = converterDDMMparaYYYYMM(dataStr);
+        let compromissosHoje = todosCompromissos.filter(c => c.data === dataCompFormat && !c.concluido);
+
+        compromissosHoje.forEach(comp => {
+            const li = document.createElement('li');
+            li.style.display = 'flex'; li.style.alignItems = 'center'; li.style.marginBottom = '8px';
+            li.innerHTML = `
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1;">
+                    <input type="checkbox" onchange="toggleCompromissoDashboard(${comp.id}, '${dataStr}')">
+                    <span><strong style="font-size: 11px; background: #4a148c; color: #fff; padding: 2px 6px; border-radius: 4px; margin-right: 5px;">COMPROMISSO</strong> ${comp.descricao}</span>
+                </label>
+            `;
+            listaTarefas.appendChild(li);
+        });
 
         todosCompromissos.forEach(c => {
             if (c.concluido) return;
@@ -316,7 +316,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 dataPadrao = `${p[2]}/${p[1]}/${p[0]}`;
             }
             
-            const el = criarElementoArrastavel(c.id, 'compromisso', c.descricao, c.data, '#e1bee7', 'COMPROMISSO');
+            // Alterado: Fundo roxo escuro (#4a148c) e texto branco (#fff) para total contraste
+            const el = criarElementoArrastavel(c.id, 'compromisso', c.descricao, c.data, '#4a148c', 'COMPROMISSO', '#fff');
             
             if (dataPadrao === "00/00/0000") {
                 if (areaEspera) areaEspera.appendChild(el);
