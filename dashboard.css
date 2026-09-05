@@ -1144,3 +1144,16 @@ input[type="checkbox"].compromisso,
 .mov-linha span {
     font-weight: normal;
 }
+
+/* Força a seção principal que envolve os dias e a lateral a esticarem por igual */
+.dashboard-container section {
+    align-items: stretch !important;
+}
+
+/* Faz a área de espera (faixa roxa/azul) preencher 100% da altura disponível */
+#areaEspera {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-height: 100%;
+}
