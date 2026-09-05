@@ -1145,15 +1145,27 @@ input[type="checkbox"].compromisso,
     font-weight: normal;
 }
 
-/* Força a seção principal que envolve os dias e a lateral a esticarem por igual */
-.dashboard-container section {
-    align-items: stretch !important;
+/* --- CORREÇÕES DO ACORDEÃO E FAIXAS LATERAIS --- */
+
+/* 1. Permite que os cartões dos dias encolham de verdade */
+.day-card {
+    min-height: auto !important; 
+}
+.span-2 {
+    min-height: auto !important;
 }
 
-/* Faz a área de espera (faixa roxa/azul) preencher 100% da altura disponível */
+/* 2. Força as seções e a faixa azul/roxa a esticarem até o fim da tela */
+.dashboard-container section, 
+.cadastro-layout, 
+.compromissos-layout {
+    align-items: stretch !important;
+    min-height: calc(100vh - 120px);
+}
+
 #areaEspera {
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     flex-grow: 1;
-    min-height: 100%;
+    height: 100%;
 }
