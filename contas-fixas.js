@@ -126,37 +126,65 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // Dar baixa no mês (Também registra o gasto automaticamente para descontar saldo!)
+        // Dar baixa no mês (Menu de seleção com mês e ano automáticos)
         document.querySelectorAll('.btn-pagar-mes').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = parseInt(e.target.getAttribute('data-id'));
                 const index = contas.findIndex(c => c.id === id);
                 if (index > -1) {
-                    const mes = prompt("Qual mês você está pagando? (Ex: Setembro/2026)");
-                    if (mes) {
-                        contas[index].mesesPagos.push(mes.trim());
-                        
-                        // Registra o valor como gasto para atualizar o saldo da conta bancária escolhida
-                        let gastos = JSON.parse(localStorage.getItem('catPlanGastos')) || [];
-                        const dataAtual = new Date();
-                        const dataFormatada = `${String(dataAtual.getDate()).padStart(2, '0')}/${String(dataAtual.getMonth() + 1).padStart(2, '0')}/${dataAtual.getFullYear()}`;
-                        
-                        gastos.unshift({
-                            id: Date.now(),
-                            titulo: `Conta Fixa: ${contas[index].titulo} (${mes.trim()})`,
-                            valor: contas[index].valorMensal,
-                            tipo: 'fixa',
-                            conta: contas[index].formaPagamento,
-                            meta: contas[index].meta,
-                            data: dataFormatada
-                        });
-                        localStorage.setItem('catPlanGastos', JSON.stringify(gastos));
+                    
+                    const dataAtualSistema = new Date();
+                    const anoAtual = dataAtualSistema.getFullYear();
+                    const mesAtualNum = dataAtualSistema.getMonth() + 1; // Mês atual de 1 a 12
+                    
+                    const nomesMeses = [
+                        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", 
+                        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+                    ];
+                    
+                    const menu = "Selecione o mês que está pagando (digite o número):\n\n" +
+                                 "1-Jan  |  2-Fev  |  3-Mar  |  4-Abr\n" +
+                                 "5-Mai  |  6-Jun  |  7-Jul  |  8-Ago\n" +
+                                 "9-Set  | 10-Out  | 11-Nov  | 12-Dez";
 
-                        if (contas[index].totalMeses > 0 && contas[index].mesesPagos.length >= contas[index].totalMeses) {
-                            alert("Parabéns! Você quitou essa conta. Ela será inativada.");
-                            contas[index].ativa = false;
+                    // Abre o prompt já sugerindo o número do mês que estamos agora!
+                    const escolha = prompt(menu, mesAtualNum);
+
+                    if (escolha) {
+                        const numEscolhido = parseInt(escolha.trim());
+                        
+                        // Valida se a pessoa digitou um número correto (de 1 a 12)
+                        if (!isNaN(numEscolhido) && numEscolhido >= 1 && numEscolhido <= 12) {
+                            
+                            // Puxa o nome da lista e adiciona o ano automaticamente
+                            const mesFormatado = `${nomesMeses[numEscolhido - 1]}/${anoAtual}`;
+                            
+                            contas[index].mesesPagos.push(mesFormatado);
+                            
+                            // Registra o valor como gasto para atualizar o saldo da conta bancária escolhida
+                            let gastos = JSON.parse(localStorage.getItem('catPlanGastos')) || [];
+                            const dataFormatada = `${String(dataAtualSistema.getDate()).padStart(2, '0')}/${String(mesAtualNum).padStart(2, '0')}/${anoAtual}`;
+                            
+                            gastos.unshift({
+                                id: Date.now(),
+                                titulo: `Conta Fixa: ${contas[index].titulo} (${mesFormatado})`,
+                                valor: contas[index].valorMensal,
+                                tipo: 'fixa',
+                                conta: contas[index].formaPagamento,
+                                meta: contas[index].meta,
+                                data: dataFormatada
+                            });
+                            localStorage.setItem('catPlanGastos', JSON.stringify(gastos));
+
+                            if (contas[index].totalMeses > 0 && contas[index].mesesPagos.length >= contas[index].totalMeses) {
+                                alert("Parabéns! Você quitou essa conta. Ela será inativada.");
+                                contas[index].ativa = false;
+                            }
+                            salvarERenderizarContas();
+                            
+                        } else {
+                            alert("Opção inválida! Por favor, digite um número de 1 a 12 correspondente ao mês.");
                         }
-                        salvarERenderizarContas();
                     }
                 }
             });
