@@ -108,7 +108,6 @@ document.addEventListener("DOMContentLoaded", () => {
             divTarefa.className = 'tarefa-arrastavel';
             divTarefa.draggable = true;
             divTarefa.id = `tarefa-${tarefa.id}`;
-            // Guarda a descrição para o filtro de pesquisa funcionar
             divTarefa.setAttribute('data-desc', tarefa.descricao.toLowerCase());
             
             if(tarefa.prioridade === 'verde') divTarefa.style.backgroundColor = '#d4edda';
@@ -123,7 +122,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             divTarefa.addEventListener('dragend', () => divTarefa.style.opacity = '1');
 
-            // Joga para o painel lateral as tarefas sem data ou em "ESPERA"
             if (tarefa.data === "ESPERA" || tarefa.data === "00/00/0000") {
                 if (areaEspera) {
                     areaEspera.appendChild(divTarefa);
@@ -137,28 +135,26 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
         
-        filtrarTarefasSemData(); // Refaz o filtro caso algo já esteja digitado
+        filtrarTarefasSemData(); 
     }
 
-const zonasDeSoltura = [document.getElementById('areaEspera'), ...document.querySelectorAll('.day-card')];
+    const zonasDeSoltura = [document.getElementById('areaEspera'), ...document.querySelectorAll('.day-card')];
     
     zonasDeSoltura.forEach(zona => {
         if (!zona) return;
         
         zona.addEventListener('dragover', (e) => {
             e.preventDefault();
-            // Dá um destaque visual quando a tarefa passa por cima
             if (zona.id === 'areaEspera') {
-                zona.style.backgroundColor = '#8eb3ea'; // Azul um pouquinho mais escuro
+                zona.style.backgroundColor = '#8eb3ea'; 
             } else {
                 zona.style.backgroundColor = 'rgba(0,0,0,0.05)';
             }
         });
 
         zona.addEventListener('dragleave', () => {
-            // Restaura a cor correta quando a tarefa sai de cima
             if (zona.id === 'areaEspera') {
-                zona.style.backgroundColor = '#a3c4f3'; // Azul original
+                zona.style.backgroundColor = '#a3c4f3'; 
             } else {
                 zona.style.backgroundColor = '';
             }
@@ -167,9 +163,8 @@ const zonasDeSoltura = [document.getElementById('areaEspera'), ...document.query
         zona.addEventListener('drop', (e) => {
             e.preventDefault();
             
-            // Restaura a cor correta quando a tarefa é solta
             if (zona.id === 'areaEspera') {
-                zona.style.backgroundColor = '#a3c4f3'; // Azul original
+                zona.style.backgroundColor = '#a3c4f3'; 
             } else {
                 zona.style.backgroundColor = '';
             }
@@ -180,7 +175,7 @@ const zonasDeSoltura = [document.getElementById('areaEspera'), ...document.query
             
             if (index !== -1) {
                 if (zona.id === 'areaEspera') {
-                    tarefas[index].data = "00/00/0000"; // Define sem data
+                    tarefas[index].data = "00/00/0000"; 
                 } else {
                     const novaData = zona.getAttribute('data-data');
                     if (novaData) tarefas[index].data = novaData;
@@ -217,63 +212,31 @@ const zonasDeSoltura = [document.getElementById('areaEspera'), ...document.query
         }
     }
 
-
-    // --- LIXEIRA ---
-    const btnLixeira = document.getElementById('btnLixeira');
-    const btnConfirmar = document.getElementById('btnConfirmarExclusao');
-    window.modoExclusaoGlobal = false;
-    let materiaParaExcluir = null;
-
-    if (btnLixeira) {
-        btnLixeira.addEventListener('click', () => {
-            window.modoExclusaoGlobal = !window.modoExclusaoGlobal;
-            if (window.modoExclusaoGlobal) {
-                btnLixeira.style.transform = "scale(1.2)";
-                btnLixeira.style.filter = "drop-shadow(0 0 5px red)";
-            } else {
-                desligarLixeira();
-            }
-        });
-    }
-
-    function desligarLixeira() {
-        window.modoExclusaoGlobal = false;
-        materiaParaExcluir = null;
-        if (btnLixeira) {
-            btnLixeira.style.transform = "scale(1)";
-            btnLixeira.style.filter = "none";
-        }
-    }
-
     // --- 7. EFEITO ACORDEÃO (ABRIR/FECHAR) NOS DIAS DA SEMANA ---
     document.querySelectorAll('.day-card').forEach(card => {
-        const header = card.querySelector('div[id^="head-"]');
+        const header = card.querySelector('[id^="head-"]');
         const container = card.querySelector('.tasks-container');
         
         if (header && container) {
-            // Estiliza o cabeçalho para indicar que é clicável
             header.style.cursor = "pointer";
             header.title = "Clique para abrir ou fechar as tarefas";
             
-            // DEIXA OS DIAS FECHADOS POR PADRÃO (Se preferir que iniciem abertos, apague a linha abaixo)
             container.style.display = "none";
-            header.style.opacity = "0.7"; // Fica levemente transparente quando fechado
+            header.style.opacity = "0.7";
             
-            // Evento de clique para abrir/fechar
             header.addEventListener('click', () => {
                 if (container.style.display === "none") {
-                    container.style.display = "block"; // Abre
+                    container.style.display = "flex"; 
                     header.style.opacity = "1";
                 } else {
-                    container.style.display = "none";  // Fecha
+                    container.style.display = "none"; 
                     header.style.opacity = "0.7";
                 }
             });
 
-            // Opcional: Se arrastar e soltar uma tarefa num dia fechado, ele abre automaticamente!
             card.addEventListener('drop', () => {
                 if (container.style.display === "none") {
-                    container.style.display = "block";
+                    container.style.display = "flex";
                     header.style.opacity = "1";
                 }
             });
