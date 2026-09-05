@@ -101,6 +101,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- RENDERIZAÇÃO DAS TAREFAS NA ESQUERDA ---
     function carregarTarefasNaTela() {
         if (!containerLista) return;
+        
+        // Salva quais chaves de cartões estavam abertas antes de atualizar
+        const abertosAtuais = JSON.parse(sessionStorage.getItem('catPlanCardsAbertos')) || {};
+
         containerLista.innerHTML = ""; 
         let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
 
@@ -151,6 +155,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const btnEditar = cardDiv.querySelector('.btn-editar');
             const btnAddPasso = cardDiv.querySelector('.btn-add-passo');
 
+            // Restaura o estado aberto/fechado baseado na sessão anterior
+            if (abertosAtuais[chave]) {
+                passosContainer.style.display = "block";
+            }
+
             grupo.passos.forEach(passo => {
                 if (passo.concluida) return; 
 
@@ -159,11 +168,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 passoDiv.style.marginBottom = "6px";
                 passoDiv.style.fontSize = "14px";
                 
-                // NOVO: Adicionado 'this' no onchange para mapear qual linha está sendo animada
                 passoDiv.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                         <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1;">
-                            <input type="checkbox" class="check-passo" onchange="marcarPassoFeito(${passo.id}, this)"> 
+                            <input type="checkbox" class="check-passo" onchange="marcarPassoFeito(${passo.id}, this, '${chave}')"> 
                             <span>${passo.descricao}</span>
                         </label>
                         <div style="display: flex; align-items: center; gap: 10px;">
@@ -176,7 +184,13 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             infoTitulo.addEventListener('click', () => {
-                passosContainer.style.display = passosContainer.style.display === "none" ? "block" : "none";
+                const isOpen = passosContainer.style.display === "block";
+                passosContainer.style.display = isOpen ? "none" : "block";
+                
+                // Atualiza o estado na sessão
+                let abertos = JSON.parse(sessionStorage.getItem('catPlanCardsAbertos')) || {};
+                abertos[chave] = !isOpen;
+                sessionStorage.setItem('catPlanCardsAbertos', JSON.stringify(abertos));
             });
 
             btnConcluir.addEventListener('click', (e) => {
@@ -218,18 +232,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- FUNÇÕES GLOBAIS DE EDIÇÃO COM ANIMAÇÃO ---
-    window.marcarPassoFeito = function(idPasso, checkboxElement) {
-        // Encontra a linha inteira do passo a passo
+    window.marcarPassoFeito = function(idPasso, checkboxElement, chaveGrupo) {
+        // Garante que o card atual permaneça marcado como aberto na sessão durante a transição
+        let abertos = JSON.parse(sessionStorage.getItem('catPlanCardsAbertos')) || {};
+        abertos[chaveGrupo] = true;
+        sessionStorage.setItem('catPlanCardsAbertos', JSON.stringify(abertos));
+
         const passoDiv = checkboxElement.closest('.passo-item');
         
         if (passoDiv) {
-            // Aplica a animação de saída: desliza para direita e fica transparente
             passoDiv.style.transition = "all 0.5s ease-out";
             passoDiv.style.opacity = "0";
             passoDiv.style.transform = "translateX(20px)";
         }
 
-        // Aguarda 500ms (tempo da animação) antes de excluir do sistema
         setTimeout(() => {
             let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
             const index = tarefas.findIndex(t => t.id === idPasso);
@@ -349,64 +365,6 @@ document.addEventListener("DOMContentLoaded", () => {
             desenharMaterias();
             sincronizarComNuvem();
         }
-    }
-
-    // --- LIXEIRA ---
-    const btnLixeira = document.getElementById('btnLixeira');
-    const btnConfirmar = document.getElementById('btnConfirmarExclusao');
-    window.modoExclusaoGlobal = false;
-    let materiaParaExcluir = null;
-
-    if (btnLixeira) {
-        btnLixeira.addEventListener('click', () => {
-            window.modoExclusaoGlobal = !window.modoExclusaoGlobal;
-            if (window.modoExclusaoGlobal) {
-                btnLixeira.style.transform = "scale(1.2)";
-                btnLixeira.style.filter = "drop-shadow(0 0 5px red)";
-            } else {
-                desligarLixeira();
-            }
-        });
-    }
-
-    function selecionarMateriaParaExcluir(e, nomeMateria, divElement) {
-        if (!window.modoExclusaoGlobal) return;
-        document.querySelectorAll('.materia-item-grid').forEach(m => m.style.backgroundColor = '#fff');
-        divElement.style.backgroundColor = '#ffcccc'; 
-        materiaParaExcluir = nomeMateria;
-    }
-
-    if (btnConfirmar) {
-        btnConfirmar.addEventListener('click', () => {
-            if (window.modoExclusaoGlobal && materiaParaExcluir) {
-                let materias = JSON.parse(localStorage.getItem('catPlanMaterias')) || [];
-                materias = materias.filter(m => m.nome !== materiaParaExcluir);
-                localStorage.setItem('catPlanMaterias', JSON.stringify(materias));
-
-                let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
-                tarefas.forEach(t => {
-                    if (t.materia === materiaParaExcluir) {
-                        t.materia = "MATÉRIA APAGADA";
-                    }
-                });
-                localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
-
-                desligarLixeira();
-                desenharMaterias();
-                carregarTarefasNaTela();
-                sincronizarComNuvem();
-            }
-        });
-    }
-
-    function desligarLixeira() {
-        window.modoExclusaoGlobal = false;
-        materiaParaExcluir = null;
-        if (btnLixeira) {
-            btnLixeira.style.transform = "scale(1)";
-            btnLixeira.style.filter = "none";
-        }
-        document.querySelectorAll('.materia-item-grid').forEach(m => m.style.backgroundColor = '#fff');
     }
 
     // Chamadas iniciais
