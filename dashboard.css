@@ -1155,24 +1155,19 @@ input[type="checkbox"].compromisso,
     min-height: auto !important;
 }
 
-/* --- ESTICAR DEFINITIVAMENTE AS FAIXAS DE TAREFAS SEM DATA --- */
+/* --- CORREÇÃO DEFINITIVA DO TAMANHO DA CAIXA "SEM DATA" --- */
 
-/* 1. Permite que o container principal ocupe toda a altura da tela */
-html, body, .dashboard-container {
-    height: 100%;
-}
-
-/* 2. Força a coluna central (onde ficam os dias) e a lateral a esticarem juntas */
-.dashboard-container {
-    display: flex;
+/* Permite que o container que segura os blocos estique corretamente em altura */
+.dashboard-container, 
+.calendario-estudos {
+    display: flex !important;
     align-items: stretch !important;
 }
 
-/* 3. Faz a caixa de "Tarefas Sem Data" (tanto a azul quanto a roxa) preencher 100% da altura da coluna */
+/* Faz com que a caixa de "Tarefas Sem Data" ocupe dinamicamente o espaço da coluna lateral sem quebrar a tela */
 #areaEspera {
     display: flex !important;
     flex-direction: column;
-    flex-grow: 1 !important;
-    height: 100% !important;
-    min-height: 100% !important;
+    flex: 1;
+    box-sizing: border-box;
 }
