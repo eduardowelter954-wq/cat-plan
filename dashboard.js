@@ -79,7 +79,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         displayData.innerText = dataStr;
         calendarioPicker.value = `${dataAtual.getFullYear()}-${String(dataAtual.getMonth() + 1).padStart(2, '0')}-${String(dataAtual.getDate()).padStart(2, '0')}`;
         
-        // Define a grade da semana baseada na dataAtual
         const diaSemana = dataAtual.getDay();
         const diferencaParaSegunda = dataAtual.getDate() - diaSemana + (diaSemana === 0 ? -6 : 1);
         const segundaFeira = new Date(new Date(dataAtual).setDate(diferencaParaSegunda));
@@ -112,7 +111,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    // --- 2. ADIÇÃO DE DADOS (ROTINA E TAREFAS DIÁRIAS) ---
+    // --- 2. ADIÇÃO DE DADOS ---
     btnAddRotina.addEventListener('click', () => {
         const texto = inputRotina.value.trim();
         if (texto !== "") {
@@ -149,7 +148,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     inputTarefa.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); btnAddTarefa.click(); } });
     inputRotina.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); btnAddRotina.click(); } });
 
-    // --- 3. MOTOR DE RENDERIZAÇÃO GERAL E ARRASTAR/SOLTAR ---
+    // --- 3. MOTOR DE RENDERIZAÇÃO ---
     function criarElementoArrastavel(id, tipo, texto, dataAntiga, corFundo = '#fff', tag = '', corTexto = '#000') {
         const div = document.createElement('div');
         div.className = 'tarefa-arrastavel';
@@ -166,7 +165,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         div.style.width = "100%";
         div.setAttribute('data-desc', texto.toLowerCase());
         
-        let tagBg = corTexto === '#fff' ? 'rgba(255,255,255,0.2)' : '#e0e0e0';
+        let tagBg = corTexto === '#fff' ? 'rgba(0,0,0,0.15)' : '#e0e0e0';
         let conteudo = tag ? `<div style="font-size:10px; background:${tagBg}; padding:2px 6px; border-radius:4px; display:inline-block; margin-bottom:4px;">${tag}</div><br>` : '';
         conteudo += `<span>${texto}</span>`;
         div.innerHTML = conteudo;
@@ -205,7 +204,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             listaRotina.appendChild(li);
         });
 
-        // 3.2. INJETAR ROTINA NOS DIAS DO CALENDÁRIO
+        // 3.2. INJETAR ROTINAS NOS DIAS
         const weekCards = document.querySelectorAll('.day-card');
         weekCards.forEach(card => {
             const dateAttr = card.getAttribute('data-data');
@@ -291,7 +290,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
-        // 3.5. COMPROMISSOS COM A NOVA COR #4D4EDD
+        // 3.5. COMPROMISSOS COM O ROXO SUAVE E EQUILIBRADO (#b39ddb)
         let todosCompromissos = JSON.parse(localStorage.getItem('catPlanCompromissos')) || [];
         const dataCompFormat = converterDDMMparaYYYYMM(dataStr);
         let compromissosHoje = todosCompromissos.filter(c => c.data === dataCompFormat && !c.concluido);
@@ -302,7 +301,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             li.innerHTML = `
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1;">
                     <input type="checkbox" onchange="toggleCompromissoDashboard(${comp.id}, '${dataStr}')">
-                    <span><strong style="font-size: 11px; background: #4D4EDD; color: #fff; padding: 2px 6px; border-radius: 4px; margin-right: 5px;">COMPROMISSO</strong> ${comp.descricao}</span>
+                    <span><strong style="font-size: 11px; background: #673ab7; color: #fff; padding: 2px 6px; border-radius: 4px; margin-right: 5px;">COMPROMISSO</strong> ${comp.descricao}</span>
                 </label>
             `;
             listaTarefas.appendChild(li);
@@ -316,8 +315,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 dataPadrao = `${p[2]}/${p[1]}/${p[0]}`;
             }
             
-            // Alterado: Fundo #4D4EDD e texto branco
-            const el = criarElementoArrastavel(c.id, 'compromisso', c.descricao, c.data, '#4D4EDD', 'COMPROMISSO', '#fff');
+            // Fundo roxo suave/pastel (#b39ddb) com texto escuro para leitura perfeita e limpa
+            const el = criarElementoArrastavel(c.id, 'compromisso', c.descricao, c.data, '#b39ddb', 'COMPROMISSO', '#111');
             
             if (dataPadrao === "00/00/0000") {
                 if (areaEspera) areaEspera.appendChild(el);
@@ -330,7 +329,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         filtrarPainelRoxo();
     }
 
-    // --- 4. FUNÇÕES DE STATUS (CONCLUIR / APAGAR) ---
+    // --- 4. FUNÇÕES DE STATUS ---
     window.toggleRotina = function(idRotina, dataStr) {
         let checksPorDia = JSON.parse(localStorage.getItem('catPlanRotinasChecks')) || {};
         if (!checksPorDia[dataStr]) checksPorDia[dataStr] = [];
@@ -386,7 +385,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // --- 5. LÓGICA DE ARRASTAR E SOLTAR (ZONAS DE DROP) ---
+    // --- 5. ARRASTAR E SOLTAR ---
     const zonasDeSoltura = [document.getElementById('areaEspera'), ...document.querySelectorAll('.day-card')];
     
     zonasDeSoltura.forEach(zona => {
@@ -447,7 +446,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
-    // --- 6. BARRA DE PESQUISA DO PAINEL ROXO ---
+    // --- 6. PESQUISA ---
     if (inputPesquisa) {
         inputPesquisa.addEventListener('input', filtrarPainelRoxo);
     }
