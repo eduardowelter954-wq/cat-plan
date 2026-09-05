@@ -1155,12 +1155,16 @@ input[type="checkbox"].compromisso,
     min-height: auto !important;
 }
 
-/* 2. Força as seções e a faixa azul/roxa a esticarem até o fim da tela */
-.dashboard-container section, 
-.cadastro-layout, 
-.compromissos-layout {
+/* Força o alinhamento nas outras telas, mas protege o formulário de compromissos */
+.dashboard-container section:not(.compromissos-layout), 
+.cadastro-layout {
     align-items: stretch !important;
     min-height: calc(100vh - 120px);
+}
+
+/* Mantém o layout de compromissos alinhado ao topo, impedindo que o card estique */
+.compromissos-layout {
+    align-items: flex-start !important;
 }
 
 #areaEspera {
