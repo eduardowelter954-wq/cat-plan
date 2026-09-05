@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.querySelectorAll('.tasks-container').forEach(c => c.innerHTML = "");
         if (areaEspera) areaEspera.innerHTML = `<h3 style="color: #4a148c; font-size: 16px; text-align: center; margin-bottom: 10px; margin-top: 0;">Tarefas e Compromissos Sem Data</h3>`;
 
-        // 3.1. ROTINAS
+        // 3.1. ROTINAS NA BARRA LATERAL (Mantém o comportamento anterior de riscar/esmaecer)
         let rotinas = JSON.parse(localStorage.getItem('catPlanRotinasGlobal')) || [];
         let checksPorDia = JSON.parse(localStorage.getItem('catPlanRotinasChecks')) || {};
         let concluidasHoje = checksPorDia[dataStr] || [];
@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             listaRotina.appendChild(li);
         });
 
-        // 3.2. INJETAR ROTINAS NOS DIAS
+        // 3.2. INJETAR ROTINAS NOS DIAS DO CALENDÁRIO (Soma apenas as que NÃO foram concluídas neste dia)
         const weekCards = document.querySelectorAll('.day-card');
         weekCards.forEach(card => {
             const dateAttr = card.getAttribute('data-data');
@@ -214,10 +214,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             const concluidasNesteDia = checksPorDia[dateAttr] || [];
 
             rotinas.forEach(rotina => {
-                const isChecked = concluidasNesteDia.includes(rotina.id);
+                // Se já foi concluída neste dia específico, pula e não exibe no calendário
+                if (concluidasNesteDia.includes(rotina.id)) return;
                 
                 const divRotina = document.createElement('div');
-                divRotina.style.backgroundColor = isChecked ? 'rgba(255,255,255,0.6)' : '#f3e5f5';
+                divRotina.style.backgroundColor = '#f3e5f5';
                 divRotina.style.border = "2px dashed #ab47bc";
                 divRotina.style.borderRadius = "8px";
                 divRotina.style.padding = "8px";
@@ -225,16 +226,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 divRotina.style.fontSize = "13px";
                 divRotina.style.fontWeight = "bold";
                 divRotina.style.width = "100%";
-                divRotina.style.opacity = isChecked ? "0.6" : "1";
 
                 divRotina.innerHTML = `
-                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0; width: 100%;">
-                        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleRotina(${rotina.id}, '${dateAttr}')" style="cursor: pointer;">
-                        <div style="flex-grow: 1; text-decoration: ${isChecked ? 'line-through' : 'none'};">
+                    <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
+                        <div style="flex-grow: 1;">
                             <span style="font-size:10px; background:#ab47bc; color: #fff; padding:2px 5px; border-radius:4px; margin-right: 6px;">ROTINA</span>
                             ${rotina.texto}
                         </div>
-                    </label>
+                    </div>
                 `;
                 containerDia.appendChild(divRotina);
             });
@@ -290,7 +289,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
-        // 3.5. COMPROMISSOS COM O ROXO SUAVE E EQUILIBRADO (#b39ddb)
+        // 3.5. COMPROMISSOS COM O ROXO SUAVE (#b39ddb)
         let todosCompromissos = JSON.parse(localStorage.getItem('catPlanCompromissos')) || [];
         const dataCompFormat = converterDDMMparaYYYYMM(dataStr);
         let compromissosHoje = todosCompromissos.filter(c => c.data === dataCompFormat && !c.concluido);
@@ -315,7 +314,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 dataPadrao = `${p[2]}/${p[1]}/${p[0]}`;
             }
             
-            // Fundo roxo suave/pastel (#b39ddb) com texto escuro para leitura perfeita e limpa
             const el = criarElementoArrastavel(c.id, 'compromisso', c.descricao, c.data, '#b39ddb', 'COMPROMISSO', '#111');
             
             if (dataPadrao === "00/00/0000") {
