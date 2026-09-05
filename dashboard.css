@@ -1155,18 +1155,14 @@ input[type="checkbox"].compromisso,
     min-height: auto !important;
 }
 
-/* Força o alinhamento nas outras telas, mas protege o formulário de compromissos */
-.dashboard-container section:not(.compromissos-layout), 
-.cadastro-layout {
+/* --- ESTICAR APENAS AS FAIXAS DE TAREFAS SEM DATA (AZUL E ROXA) --- */
+
+/* Garante que o layout das abas de Agenda e Estudos permitam o estiramento */
+.dashboard-container {
     align-items: stretch !important;
-    min-height: calc(100vh - 120px);
 }
 
-/* Mantém o layout de compromissos alinhado ao topo, impedindo que o card estique */
-.compromissos-layout {
-    align-items: flex-start !important;
-}
-
+/* Força exclusivamente a faixa lateral de "Tarefas Sem Data" a preencher 100% da altura */
 #areaEspera {
     display: flex !important;
     flex-direction: column;
