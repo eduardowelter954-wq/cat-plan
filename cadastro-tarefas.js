@@ -159,10 +159,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 passoDiv.style.marginBottom = "6px";
                 passoDiv.style.fontSize = "14px";
                 
+                // NOVO: Adicionado 'this' no onchange para mapear qual linha está sendo animada
                 passoDiv.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                         <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex-grow: 1;">
-                            <input type="checkbox" class="check-passo" onchange="marcarPassoFeito(${passo.id})"> 
+                            <input type="checkbox" class="check-passo" onchange="marcarPassoFeito(${passo.id}, this)"> 
                             <span>${passo.descricao}</span>
                         </label>
                         <div style="display: flex; align-items: center; gap: 10px;">
@@ -216,16 +217,29 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- FUNÇÕES GLOBAIS DE EDIÇÃO ---
-    window.marcarPassoFeito = function(idPasso) {
-        let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
-        const index = tarefas.findIndex(t => t.id === idPasso);
-        if (index !== -1) {
-            tarefas[index].concluida = true; 
-            localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
-            carregarTarefasNaTela(); 
-            sincronizarComNuvem(); 
+    // --- FUNÇÕES GLOBAIS DE EDIÇÃO COM ANIMAÇÃO ---
+    window.marcarPassoFeito = function(idPasso, checkboxElement) {
+        // Encontra a linha inteira do passo a passo
+        const passoDiv = checkboxElement.closest('.passo-item');
+        
+        if (passoDiv) {
+            // Aplica a animação de saída: desliza para direita e fica transparente
+            passoDiv.style.transition = "all 0.5s ease-out";
+            passoDiv.style.opacity = "0";
+            passoDiv.style.transform = "translateX(20px)";
         }
+
+        // Aguarda 500ms (tempo da animação) antes de excluir do sistema
+        setTimeout(() => {
+            let tarefas = JSON.parse(localStorage.getItem('catPlanTarefasEstudos')) || [];
+            const index = tarefas.findIndex(t => t.id === idPasso);
+            if (index !== -1) {
+                tarefas[index].concluida = true; 
+                localStorage.setItem('catPlanTarefasEstudos', JSON.stringify(tarefas));
+                carregarTarefasNaTela(); 
+                sincronizarComNuvem(); 
+            }
+        }, 500);
     };
 
     window.editarPasso = function(idPasso) {
@@ -254,7 +268,7 @@ document.addEventListener("DOMContentLoaded", () => {
             carregarTarefasNaTela(); 
             sincronizarComNuvem(); 
         }
-    }; // AQUI ESTAVA O ERRO NO CÓDIGO ANTERIOR!
+    }; 
 
     // ==========================================
     // --- LÓGICA DAS MATÉRIAS E LIXEIRA ---
