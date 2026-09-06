@@ -28,6 +28,16 @@ document.addEventListener("DOMContentLoaded", () => {
             const valor = prompt("Qual o valor mensal?");
             if (!valor) return;
 
+            // NOVO: Pergunta a data de vencimento
+            const vencimentoStr = prompt("Qual a data de vencimento? (Ex: 15/09/2026)\nDeixe em branco se não tiver data certa.");
+            let vencimentoFinal = "";
+            if (vencimentoStr && vencimentoStr.trim() !== "") {
+                const p = vencimentoStr.split('/');
+                if (p.length === 3) {
+                    vencimentoFinal = `${p[2]}-${p[1]}-${p[0]}`; // Salva no padrão AAAA-MM-DD
+                }
+            }
+
             const contasCadastradas = JSON.parse(localStorage.getItem('catPlanContasBancarias')) || [];
             let textoContas = "Suas contas cadastradas:\n";
             contasCadastradas.forEach((c, idx) => {
@@ -62,6 +72,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 valorMensal: parseFloat(valor.replace(',', '.')) || 0,
                 formaPagamento: formaPagamentoFinal,
                 meta: metaFinal,
+                vencimento: vencimentoFinal, // Adicionado
+                pagoNoMes: false,            // Controle da Agenda
                 mesesPagos: [],
                 ativa: true
             };
@@ -86,16 +98,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const textoMes = conta.totalMeses > 0 ? `${qtdPagos}/${conta.totalMeses}` : `Contínuo (${qtdPagos} pagos)`;
             const valorTotal = conta.totalMeses > 0 ? (conta.totalMeses * conta.valorMensal).toFixed(2) : "Indefinido";
             
-            // NOVO: Cálculo do total já pago, identificando se você pagou o valor cravado ou um valor diferente
             let valorTotalPago = 0;
             let historicoNomes = [];
             conta.mesesPagos.forEach(p => {
                 if (typeof p === 'string') {
-                    // Compatibilidade com meses velhos que só tinham o nome
                     valorTotalPago += conta.valorMensal;
                     historicoNomes.push(p);
                 } else {
-                    // Meses novos que guardam o valor exato
                     valorTotalPago += p.valor;
                     historicoNomes.push(`${p.mes} (R$ ${p.valor.toFixed(2)})`);
                 }
@@ -104,15 +113,31 @@ document.addEventListener("DOMContentLoaded", () => {
             const historico = historicoNomes.length > 0 ? historicoNomes.join(', ') : "Nenhum";
             const corStatus = conta.ativa ? 'status-verde' : 'status-vermelho';
 
+            // Montagem do Vencimento na tela
+            let linhaVencimento = "";
+            if (conta.vencimento) {
+                const p = conta.vencimento.split('-');
+                linhaVencimento = `<div class="conta-linha">Vencimento: <span>${p[2]}/${p[1]}/${p[0]}</span></div>`;
+            }
+
             const linhaMeta = (conta.meta.toLowerCase() !== 'não' && conta.meta !== '') 
                 ? `<div class="conta-linha">Para meta: <span>${conta.meta}</span></div>` 
                 : '';
                 
-            // NOVO: Mostra quanto falta para acabar de pagar a conta inteira (se houver total de meses)
             let linhaFalta = '';
             if (conta.totalMeses > 0) {
                 const falta = Math.max(0, (conta.totalMeses * conta.valorMensal) - valorTotalPago);
                 linhaFalta = `<div class="conta-linha" style="color: #d32f2f; font-weight: bold;">Falta pagar: <span>R$ ${falta.toFixed(2)}</span></div>`;
+            }
+
+            // NOVO: Se a conta estiver paga no mês, exibe o botão para jogar pro próximo mês
+            let botoesAcao = '';
+            if (conta.ativa) {
+                if (!conta.pagoNoMes) {
+                    botoesAcao = `<button class="btn-pagar-mes" data-id="${conta.id}">+ Dar baixa no mês</button>`;
+                } else {
+                    botoesAcao = `<button class="btn-pagar-mes" style="background-color: #ffd54f;" data-restaurar-id="${conta.id}" title="Atualiza o vencimento e devolve para a agenda">Lançar p/ Próximo Mês</button>`;
+                }
             }
 
             divConta.innerHTML = `
@@ -120,6 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <img src="icone-editar.png" class="edit-conta-btn" data-id="${conta.id}" title="Editar Conta">
                 
                 <div class="conta-titulo">${conta.titulo}</div>
+                ${linhaVencimento}
                 <div class="conta-linha">Mês: <span>${textoMes}</span></div>
                 <div class="conta-linha">Valor base: <span>R$ ${conta.valorMensal.toFixed(2)} mensal</span></div>
                 ${conta.totalMeses > 0 ? `<div class="conta-linha">Valor total esperado: <span>R$ ${valorTotal}</span></div>` : ''}
@@ -130,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="conta-linha" style="margin-top: 10px;">Meses pagos: <span>${historico}</span></div>
                 
                 <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    ${conta.ativa ? `<button class="btn-pagar-mes" data-id="${conta.id}">+ Dar baixa no mês</button>` : ''}
+                    ${botoesAcao}
                 </div>
             `;
             containerContas.appendChild(divConta);
@@ -148,8 +174,8 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // Dar baixa no mês (Pergunta valor pago e informa quanto falta)
-        document.querySelectorAll('.btn-pagar-mes').forEach(btn => {
+        // Dar baixa no mês (Remove da Agenda)
+        document.querySelectorAll('.btn-pagar-mes[data-id]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = parseInt(e.target.getAttribute('data-id'));
                 const index = contas.findIndex(c => c.id === id);
@@ -174,15 +200,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         if (!isNaN(numEscolhido) && numEscolhido >= 1 && numEscolhido <= 12) {
                             const mesFormatado = `${nomesMeses[numEscolhido - 1]}/${anoAtual}`;
                             
-                            // NOVO: Pergunta o valor exato pago (útil se teve juros ou desconto)
                             const valorPagoStr = prompt(`Qual foi o valor pago referente a ${mesFormatado}?`, contas[index].valorMensal);
                             if (valorPagoStr === null) return;
                             const valorPago = parseFloat(valorPagoStr.replace(',', '.')) || contas[index].valorMensal;
 
-                            // Salva como um objeto contendo o mês e o valor
                             contas[index].mesesPagos.push({ mes: mesFormatado, valor: valorPago });
                             
-                            // Atualiza os gastos com o valor exato pago
                             let gastos = JSON.parse(localStorage.getItem('catPlanGastos')) || [];
                             const dataFormatada = `${String(dataAtualSistema.getDate()).padStart(2, '0')}/${String(mesAtualNum).padStart(2, '0')}/${anoAtual}`;
                             
@@ -197,13 +220,12 @@ document.addEventListener("DOMContentLoaded", () => {
                             });
                             localStorage.setItem('catPlanGastos', JSON.stringify(gastos));
 
-                            // NOVO: Calcula o que falta para mostrar um alerta informativo bacana
                             let totalPagoAgora = 0;
                             contas[index].mesesPagos.forEach(p => {
                                  totalPagoAgora += (typeof p === 'string') ? contas[index].valorMensal : p.valor;
                             });
                             
-                            let msgAlerta = `Baixa de ${mesFormatado} registrada com sucesso no valor de R$ ${valorPago.toFixed(2)}!`;
+                            let msgAlerta = `Baixa de ${mesFormatado} registrada com sucesso no valor de R$ ${valorPago.toFixed(2)}!\nA conta foi removida do calendário deste mês.`;
 
                             if (contas[index].totalMeses > 0) {
                                  const totalEsperado = contas[index].totalMeses * contas[index].valorMensal;
@@ -217,6 +239,9 @@ document.addEventListener("DOMContentLoaded", () => {
                                  }
                             }
 
+                            // NOVO: Define como paga no mês (Tira do Dashboard)
+                            contas[index].pagoNoMes = true;
+
                             alert(msgAlerta);
                             salvarERenderizarContas();
                             
@@ -228,7 +253,35 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // Clique no lápis (NOVO: Permite editar os meses faltantes)
+        // Botão para jogar a conta para o próximo mês
+        document.querySelectorAll('button[data-restaurar-id]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.target.getAttribute('data-restaurar-id'));
+                const index = contas.findIndex(c => c.id === id);
+                if (index > -1) {
+                    
+                    // Avança 1 mês no vencimento automaticamente
+                    if (contas[index].vencimento) {
+                        const p = contas[index].vencimento.split('-');
+                        let dataObj = new Date(p[0], parseInt(p[1]) - 1, p[2]);
+                        dataObj.setMonth(dataObj.getMonth() + 1);
+                        
+                        let novoAno = dataObj.getFullYear();
+                        let novoMes = String(dataObj.getMonth() + 1).padStart(2, '0');
+                        let novoDia = String(dataObj.getDate()).padStart(2, '0');
+                        
+                        contas[index].vencimento = `${novoAno}-${novoMes}-${novoDia}`;
+                    }
+
+                    // Traz de volta para a Agenda
+                    contas[index].pagoNoMes = false; 
+                    salvarERenderizarContas();
+                    alert("A conta voltou para a agenda do próximo mês!");
+                }
+            });
+        });
+
+        // Clique no lápis (Editar)
         document.querySelectorAll('.edit-conta-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = parseInt(e.target.getAttribute('data-id'));
@@ -243,8 +296,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     const novoValor = prompt("Novo valor mensal base:", conta.valorMensal);
                     if (novoValor) conta.valorMensal = parseFloat(novoValor.replace(',', '.')) || conta.valorMensal;
 
-                    // A magia da edição dos meses
-                    const novoMeses = prompt("Nova quantidade TOTAL de parcelas/meses (Digite 0 se for uma conta contínua sem fim):", conta.totalMeses);
+                    // Editar Vencimento
+                    const dataAtualStr = conta.vencimento ? conta.vencimento.split('-').reverse().join('/') : '';
+                    const novoVencimento = prompt("Nova data de vencimento (DD/MM/AAAA) ou deixe em branco:", dataAtualStr);
+                    if (novoVencimento !== null) {
+                        if (novoVencimento.trim() === '') {
+                            conta.vencimento = "";
+                        } else {
+                            const p = novoVencimento.split('/');
+                            if (p.length === 3) conta.vencimento = `${p[2]}-${p[1]}-${p[0]}`;
+                        }
+                    }
+
+                    const novoMeses = prompt("Nova quantidade TOTAL de parcelas/meses (Digite 0 se for uma conta contínua):", conta.totalMeses);
                     if (novoMeses !== null) conta.totalMeses = parseInt(novoMeses) || 0;
 
                     salvarERenderizarContas();
