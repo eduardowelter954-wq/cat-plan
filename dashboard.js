@@ -204,15 +204,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             listaRotina.appendChild(li);
         });
 
-        // 3.2. INJETAR ROTINAS NOS DIAS DO CALENDÁRIO
+        // 3.2. INJETAR ROTINAS NOS DIAS
         const weekCards = document.querySelectorAll('.day-card');
         weekCards.forEach(card => {
             const dateAttr = card.getAttribute('data-data');
             const containerDia = card.querySelector('.tasks-container');
             if (!containerDia || !dateAttr) return;
-
             const concluidasNesteDia = checksPorDia[dateAttr] || [];
-
             rotinas.forEach(rotina => {
                 if (concluidasNesteDia.includes(rotina.id)) return;
                 
@@ -312,14 +310,57 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const p = c.data.split('-');
                 dataPadrao = `${p[2]}/${p[1]}/${p[0]}`;
             }
-            
             const el = criarElementoArrastavel(c.id, 'compromisso', c.descricao, c.data, '#b39ddb', 'COMPROMISSO', '#111');
-            
             if (dataPadrao === "00/00/0000") {
                 if (areaEspera) areaEspera.appendChild(el);
             } else {
                 const dayCard = document.querySelector(`.day-card[data-data="${dataPadrao}"] .tasks-container`);
                 if (dayCard) dayCard.appendChild(el);
+            }
+        });
+
+        // 3.6. CONTAS FIXAS NO CALENDÁRIO
+        let contasFixas = JSON.parse(localStorage.getItem('catPlanContasFixas')) || [];
+        contasFixas.forEach(conta => {
+            // Regra principal: Se o mês já foi pago/baixado, a conta sai da agenda imediatamente!
+            if (conta.pagoNoMes) return; 
+
+            let dataPadrao = "00/00/0000";
+            if (conta.vencimento && conta.vencimento !== "") {
+                const partes = conta.vencimento.split('-');
+                dataPadrao = `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+
+            const elConta = document.createElement('div');
+            elConta.className = 'tarefa-arrastavel';
+            elConta.draggable = true;
+            elConta.style.backgroundColor = '#d4edda'; 
+            elConta.style.border = "2px solid #28a745";
+            elConta.style.borderRadius = "8px";
+            elConta.style.padding = "8px";
+            elConta.style.marginBottom = "8px";
+            elConta.style.fontSize = "13px";
+            elConta.style.fontWeight = "bold";
+            elConta.style.width = "100%";
+            elConta.style.color = "#000";
+            elConta.setAttribute('data-desc', conta.nome ? conta.nome.toLowerCase() : '');
+            
+            elConta.innerHTML = `
+                <div style="font-size:10px; background:#28a745; color:#fff; padding:2px 5px; border-radius:4px; display:inline-block; margin-bottom:4px;">CONTA FIXA</div><br>
+                <span>${conta.nome} - R$ ${conta.valor || '0,00'}</span>
+            `;
+
+            elConta.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', JSON.stringify({ id: conta.id, type: 'conta', oldDate: dataPadrao }));
+                setTimeout(() => elConta.style.opacity = '0.5', 0);
+            });
+            elConta.addEventListener('dragend', () => elConta.style.opacity = '1');
+
+            if (dataPadrao === "00/00/0000") {
+                if (areaEspera) areaEspera.appendChild(elConta);
+            } else {
+                const dayCard = document.querySelector(`.day-card[data-data="${dataPadrao}"] .tasks-container`);
+                if (dayCard) dayCard.appendChild(elConta);
             }
         });
         
@@ -435,6 +476,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (idx !== -1) {
                     compromissos[idx].data = newDate === '00/00/0000' ? "" : converterDDMMparaYYYYMM(newDate);
                     localStorage.setItem('catPlanCompromissos', JSON.stringify(compromissos));
+                }
+            }
+            // NOVO: Arrastar a Conta Fixa altera o dia de vencimento dela!
+            else if (payload.type === 'conta') {
+                let contas = JSON.parse(localStorage.getItem('catPlanContasFixas')) || [];
+                const idx = contas.findIndex(c => c.id === payload.id);
+                if (idx !== -1) {
+                    contas[idx].vencimento = newDate === '00/00/0000' ? "" : converterDDMMparaYYYYMM(newDate);
+                    localStorage.setItem('catPlanContasFixas', JSON.stringify(contas));
                 }
             }
             
