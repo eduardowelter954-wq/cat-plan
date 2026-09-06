@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
                      style="background-color: #a5d6a7; border: 3px solid #000; border-radius: 50%; width: 45px; height: 45px; 
                             display: flex; justify-content: center; align-items: center; position: absolute; 
                             bottom: 15px; right: 15px; cursor: pointer;" title="Excluir Registro">
-                    <img src="icone-lixeira.png" style="width: 20px; pointer-events: none;">
+                    <img src="lixeira-verde.png" style="width: 20px; pointer-events: none;">
                 </div>
             `;
             containerExtrato.appendChild(card);
